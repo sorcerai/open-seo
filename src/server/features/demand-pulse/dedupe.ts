@@ -29,14 +29,14 @@ export function canonicalizeDemandUrl(value: string): string {
   try {
     const url = new URL(value);
     url.hash = "";
-    for (const key of [...url.searchParams.keys()]) {
-      if (TRACKING_PARAMS.has(key.toLowerCase())) {
-        url.searchParams.delete(key);
-      }
-    }
+    // Snapshot the keys first — deleting during live iteration skips entries.
+    const trackingKeys = [...url.searchParams.keys()].filter((key) =>
+      TRACKING_PARAMS.has(key.toLowerCase()),
+    );
+    for (const key of trackingKeys) url.searchParams.delete(key);
     url.hostname = url.hostname.toLowerCase();
     url.pathname = url.pathname.replace(/\/+$/, "") || "/";
-    const sorted = [...url.searchParams.entries()].sort(([a], [b]) =>
+    const sorted = [...url.searchParams.entries()].toSorted(([a], [b]) =>
       a.localeCompare(b),
     );
     url.search = "";

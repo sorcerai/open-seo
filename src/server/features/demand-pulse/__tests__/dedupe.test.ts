@@ -29,6 +29,16 @@ describe("demand pulse deduplication", () => {
     ).toBe("https://example.com/thread?a=1&b=2");
   });
 
+  it("removes every tracking parameter when they are adjacent", () => {
+    // Deleting from a live URLSearchParams iterator shifts the remaining
+    // entries and skips one, so consecutive params are the case that catches it.
+    expect(
+      canonicalizeDemandUrl(
+        "https://example.com/t?utm_source=x&utm_medium=y&utm_campaign=z&keep=1",
+      ),
+    ).toBe("https://example.com/t?keep=1");
+  });
+
   it("detects cross-posts without collapsing independent evidence", () => {
     const result = compareDemandObservations(
       observation(),

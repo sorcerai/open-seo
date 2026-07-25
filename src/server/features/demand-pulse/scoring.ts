@@ -45,10 +45,11 @@ function weightedScore(
   weights: Record<string, number>,
 ): { score: number; components: Record<string, number> } {
   const components: Record<string, number> = {};
+  const signals: Record<string, number> = { ...vector };
   let score = 0;
 
   for (const [key, weight] of Object.entries(weights)) {
-    const raw = vector[key as keyof DemandSignalVector];
+    const raw = signals[key];
     if (!Number.isFinite(raw)) {
       throw new TypeError(`Demand signal ${key} must be a finite number`);
     }

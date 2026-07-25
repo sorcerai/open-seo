@@ -37,7 +37,7 @@ export async function mapWithConcurrency<T, R>(
   mapper: (item: T, index: number) => Promise<R>,
 ): Promise<R[]> {
   const limit = Math.max(1, Math.floor(concurrency));
-  const results = new Array<R>(items.length);
+  const results: R[] = Array.from({ length: items.length });
   let cursor = 0;
 
   async function worker(): Promise<void> {
