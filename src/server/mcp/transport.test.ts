@@ -239,6 +239,18 @@ describe("handleSelfHostedOpenSeoMcpRequest", () => {
     expect(serverInfo?.description).toContain(
       "SEO research tools for AI agents",
     );
+    expect(client.getInstructions()).toContain("Ahrefs/Semrush-style");
+    expect(client.getInstructions()).toContain("whoami and list_projects");
+    expect(client.getInstructions()).toContain(
+      "If several projects match, ask the user",
+    );
+    expect(client.getInstructions()).toContain("OpenSEO state");
+    expect(client.getInstructions()).toContain(
+      "Route narrow requests to their focused workflow",
+    );
+    expect(client.getInstructions()).toContain(
+      "unavailable or unqueried metrics as unknown, never zero",
+    );
 
     await client.close();
   });

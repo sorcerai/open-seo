@@ -33,7 +33,7 @@ function createOpenSeoMcpServer() {
     },
     {
       instructions:
-        "OpenSEO research tools use credits. Proceed with normal focused research, but ask the user for confirmation before planned batches over 2,000 credits.",
+        "OpenSEO research tools use credits. For broad Ahrefs/Semrush-style requests, first call whoami and list_projects. If several projects match, ask the user; otherwise use the matching project ID. Label results as OpenSEO state, GSC, third-party estimate, or public-web evidence. Route narrow requests to their focused workflow; treat unavailable or unqueried metrics as unknown, never zero. Ask the user for confirmation before planned batches over 2,000 credits.",
     },
   );
   registerOpenSeoMcpTools(server);

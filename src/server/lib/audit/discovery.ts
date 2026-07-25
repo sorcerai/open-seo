@@ -10,6 +10,53 @@ const MAX_SITEMAP_DEPTH = 3;
 const MAX_SITEMAP_DOCS = 300;
 const SITEMAP_CONCURRENCY = 5;
 const SITEMAP_RETRIES = 1;
+// One byte beyond the parser's RFC 9309 cap preserves truncation evidence
+// while keeping the checkpointed Workflow result well below 1 MiB.
+const MAX_ROBOTS_TXT_FETCH_BYTES = 500 * 1024 + 1;
+
+async function readRobotsTxt(response: Response): Promise<string> {
+  const reader = response.body?.getReader();
+  if (!reader) return "";
+
+  const decoder = new TextDecoder();
+  let text = "";
+  let bytesRead = 0;
+  while (bytesRead < MAX_ROBOTS_TXT_FETCH_BYTES) {
+    const { done, value } = await reader.read();
+    if (done) return text + decoder.decode();
+
+    const remaining = MAX_ROBOTS_TXT_FETCH_BYTES - bytesRead;
+    const chunk = value.subarray(0, remaining);
+    text += decoder.decode(chunk, {
+      stream: chunk.byteLength === value.byteLength,
+    });
+    bytesRead += chunk.byteLength;
+    if (chunk.byteLength < value.byteLength) break;
+  }
+
+  await reader.cancel();
+  return text + decoder.decode();
+}
+
+/**
+ * Fetch bounded raw robots.txt text for a durable Workflow checkpoint.
+ * Null means the resource is missing or unreachable.
+ */
+export async function fetchRobotsTxtText(
+  origin: string,
+): Promise<string | null> {
+  try {
+    const response = await fetch(`${origin}/robots.txt`, {
+      headers: { "User-Agent": "OpenSEO-Audit/1.0" },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!response.ok) return null;
+    return await readRobotsTxt(response);
+  } catch (error) {
+    console.warn("Failed to fetch robots.txt:", error);
+    return null;
+  }
+}
 
 const xmlParser = new XMLParser({
   ignoreAttributes: false,
@@ -19,26 +66,6 @@ const xmlParser = new XMLParser({
 export interface RobotsResult {
   isAllowed: (url: string) => boolean;
   sitemapUrls: string[];
-}
-
-/**
- * Fetch the raw robots.txt body (null = missing/unreachable). Kept separate
- * from parsing so Workflows can checkpoint the text as durable step state and
- * re-derive the parsed result deterministically on replay.
- */
-async function fetchRobotsTxtText(origin: string): Promise<string | null> {
-  try {
-    const response = await fetch(`${origin}/robots.txt`, {
-      headers: { "User-Agent": "OpenSEO-Audit/1.0" },
-      signal: AbortSignal.timeout(10_000),
-    });
-
-    if (!response.ok) return null;
-    return await response.text();
-  } catch (error) {
-    console.warn("Failed to fetch robots.txt:", error);
-    return null;
-  }
 }
 
 /** Deterministic: same text in, same result out. Null = everything allowed. */
@@ -184,8 +211,12 @@ async function fetchSitemapDocumentWithRetry(sitemapUrl: string): Promise<{
 export async function discoverUrls(
   origin: string,
   maxPages = 50,
+  checkpointedRobotsText?: string | null,
 ): Promise<{ urls: string[]; robotsText: string | null }> {
-  const robotsText = await fetchRobotsTxtText(origin);
+  const robotsText =
+    checkpointedRobotsText === undefined
+      ? await fetchRobotsTxtText(origin)
+      : checkpointedRobotsText;
   const robots = parseRobotsTxt(origin, robotsText);
 
   // Collect sitemap URLs: from robots.txt + default location

@@ -27,6 +27,7 @@ export const startAudit = createServerFn({ method: "POST" })
       startUrl: data.startUrl,
       maxPages: data.maxPages,
       lighthouseStrategy: data.lighthouseStrategy,
+      runAiCrawlerLiveCheck: data.runAiCrawlerLiveCheck,
       limitTier,
     });
 
@@ -39,6 +40,7 @@ export const startAudit = createServerFn({ method: "POST" })
           project_id: context.projectId,
           max_pages: data.maxPages ?? 50,
           run_lighthouse: data.lighthouseStrategy !== "none",
+          run_ai_crawler_live_check: data.runAiCrawlerLiveCheck,
           plan_tier: limitTier,
         },
       }),

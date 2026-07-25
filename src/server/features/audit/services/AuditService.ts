@@ -45,6 +45,7 @@ async function startAudit(input: {
   startUrl: string;
   maxPages?: number;
   lighthouseStrategy?: LighthouseStrategy;
+  runAiCrawlerLiveCheck?: boolean;
   limitTier: AuditLimitTier;
 }) {
   const limits = AUDIT_LIMITS[input.limitTier];
@@ -60,7 +61,11 @@ async function startAudit(input: {
   });
 
   const auditId = crypto.randomUUID();
-  const config: AuditConfig = { maxPages, lighthouseStrategy };
+  const config: AuditConfig = {
+    maxPages,
+    lighthouseStrategy,
+    runAiCrawlerLiveCheck: input.runAiCrawlerLiveCheck ?? false,
+  };
   const startUrl = await normalizeAndValidateStartUrl(input.startUrl);
 
   await AuditRepository.createAudit({

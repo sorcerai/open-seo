@@ -11,6 +11,7 @@ export type LighthouseStrategy = "auto" | "none";
 export interface AuditConfig {
   maxPages: number;
   lighthouseStrategy: LighthouseStrategy;
+  runAiCrawlerLiveCheck: boolean;
 }
 
 // Read-side only (writes stringify a typed AuditConfig). Stored rows may hold
@@ -29,6 +30,7 @@ const lighthouseStrategySchema = z
 const auditConfigSchema = z.object({
   maxPages: z.number().int().min(MIN_AUDIT_PAGES).max(PAID_MAX_AUDIT_PAGES),
   lighthouseStrategy: lighthouseStrategySchema,
+  runAiCrawlerLiveCheck: z.boolean().optional().default(false),
 });
 
 const auditConfigCodec = jsonCodec(auditConfigSchema);

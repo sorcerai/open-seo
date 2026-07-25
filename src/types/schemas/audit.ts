@@ -18,6 +18,7 @@ export const startAuditSchema = z.object({
     .optional()
     .default(DEFAULT_AUDIT_PAGES),
   lighthouseStrategy: z.enum(["auto", "none"]).optional().default("auto"),
+  runAiCrawlerLiveCheck: z.boolean().optional().default(false),
 });
 
 export const getAuditStatusSchema = z.object({

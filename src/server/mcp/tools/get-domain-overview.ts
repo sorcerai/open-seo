@@ -34,15 +34,21 @@ export const getDomainOverviewTool = {
   config: {
     title: "Get domain overview",
     description:
-      "Returns a high-level view of a domain's organic footprint: estimated organic traffic, organic keyword count, backlinks, and referring domains. Use this first for domain research; for the detailed ranked-keyword list, call get_domain_keyword_suggestions next. Charges credits (~100-300 typical). Cached for 12 hours per domain.",
+      "Returns high-level DataForSEO organic estimates for a domain. It does not query backlink data; call get_backlinks_overview for backlinks and referring domains. Use this first for domain research; for the detailed ranked-keyword list, call get_domain_keyword_suggestions next. Charges credits (~100-300 typical). Cached for 12 hours per domain.",
     inputSchema,
     outputSchema: z
       .object({
         domain: z.string().optional(),
         organicTraffic: z.number().nullable().optional(),
         organicKeywords: z.number().nullable().optional(),
-        backlinks: z.number().nullable().optional(),
-        referringDomains: z.number().nullable().optional(),
+        backlinks: z.null().optional(),
+        referringDomains: z.null().optional(),
+        dataAvailability: z.object({
+          organicTraffic: z.enum(["available", "unavailable"]),
+          organicKeywords: z.enum(["available", "unavailable"]),
+          backlinks: z.literal("not_queried"),
+          referringDomains: z.literal("not_queried"),
+        }),
         ...optionalMetaOutputSchema,
       })
       .passthrough(),
@@ -69,12 +75,20 @@ export const getDomainOverviewTool = {
       },
       context.billing,
     );
+    const dataAvailability = {
+      organicTraffic:
+        result.organicTraffic === null ? "unavailable" : "available",
+      organicKeywords:
+        result.organicKeywords === null ? "unavailable" : "available",
+      backlinks: "not_queried",
+      referringDomains: "not_queried",
+    } as const;
     const text = [
       `Domain: ${result.domain}`,
-      `Organic traffic: ${result.organicTraffic ?? "?"}`,
-      `Organic keywords: ${result.organicKeywords ?? "?"}`,
-      `Backlinks: ${result.backlinks ?? "?"}`,
-      `Referring domains: ${result.referringDomains ?? "?"}`,
+      `Organic traffic: ${result.organicTraffic ?? "unavailable"}`,
+      `Organic keywords: ${result.organicKeywords ?? "unavailable"}`,
+      "Backlinks: not queried; call get_backlinks_overview",
+      "Referring domains: not queried; call get_backlinks_overview",
     ].join("\n");
     return mcpResponse({
       text,
@@ -86,7 +100,12 @@ export const getDomainOverviewTool = {
           domain: args.domain,
         },
       ),
-      structuredContent: result,
+      structuredContent: {
+        ...result,
+        backlinks: null,
+        referringDomains: null,
+        dataAvailability,
+      },
     });
   }),
 };
