@@ -48,7 +48,11 @@ export function canonicalizeDemandUrl(value: string): string {
 }
 
 function tokens(value: string): Set<string> {
-  return new Set(normalizeDemandText(value).split(" ").filter((token) => token.length > 1));
+  return new Set(
+    normalizeDemandText(value)
+      .split(" ")
+      .filter((token) => token.length > 1),
+  );
 }
 
 export function jaccardSimilarity(left: string, right: string): number {
@@ -75,7 +79,8 @@ export function stableDemandFingerprint(value: string): string {
 function hoursBetween(left: string, right: string): number {
   const a = Date.parse(left);
   const b = Date.parse(right);
-  if (!Number.isFinite(a) || !Number.isFinite(b)) return Number.POSITIVE_INFINITY;
+  if (!Number.isFinite(a) || !Number.isFinite(b))
+    return Number.POSITIVE_INFINITY;
   return Math.abs(a - b) / 3_600_000;
 }
 
@@ -102,7 +107,10 @@ export function compareDemandObservations(
     };
   }
 
-  if (canonicalizeDemandUrl(left.canonicalUrl) === canonicalizeDemandUrl(right.canonicalUrl)) {
+  if (
+    canonicalizeDemandUrl(left.canonicalUrl) ===
+    canonicalizeDemandUrl(right.canonicalUrl)
+  ) {
     return {
       isDuplicate: true,
       isCrossPost: left.sourcePlatform !== right.sourcePlatform,
@@ -113,7 +121,8 @@ export function compareDemandObservations(
 
   const titleSimilarity = jaccardSimilarity(left.title, right.title);
   const nearInTime = hoursBetween(left.publishedAt, right.publishedAt) <= 72;
-  const crossPostWindow = hoursBetween(left.publishedAt, right.publishedAt) <= 24 * 14;
+  const crossPostWindow =
+    hoursBetween(left.publishedAt, right.publishedAt) <= 24 * 14;
 
   if (titleSimilarity >= 0.86 && nearInTime) {
     return {

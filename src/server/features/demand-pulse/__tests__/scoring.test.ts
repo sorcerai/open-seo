@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import { scoreDemandFamily } from "../scoring";
 import type { DemandSignalVector } from "../types";
 
-const vector = (overrides: Partial<DemandSignalVector> = {}): DemandSignalVector => ({
+const vector = (
+  overrides: Partial<DemandSignalVector> = {},
+): DemandSignalVector => ({
   crossSourceDiversity: 0,
   commercialProximity: 0,
   firstPartyCorroboration: 0,

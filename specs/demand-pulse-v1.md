@@ -25,9 +25,9 @@ evaluates page coverage and AI/search evidence, and measures outcomes.
 
 ## System boundary
 
-| Plane | Owns |
-| --- | --- |
-| OpenSEO | connections, adapters, schedules, raw/normalized evidence, D1/R2, source health, cost, UI, MCP |
+| Plane         | Owns                                                                                            |
+| ------------- | ----------------------------------------------------------------------------------------------- |
+| OpenSEO       | connections, adapters, schedules, raw/normalized evidence, D1/R2, source health, cost, UI, MCP  |
 | Constellation | Prompt Demand Graph, corroboration promotion, coverage, action, AI/search measurement, outcomes |
 
 ## MVP adapters

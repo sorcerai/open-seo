@@ -97,10 +97,7 @@ export function getDemandRetentionProfile(
   return { ...(override ?? BASE_PROFILES[sourceClass]) };
 }
 
-export function calculateExpiry(
-  collectedAt: string,
-  days: number,
-): string {
+export function calculateExpiry(collectedAt: string, days: number): string {
   const timestamp = Date.parse(collectedAt);
   if (!Number.isFinite(timestamp)) {
     throw new TypeError(`Invalid collectedAt timestamp: ${collectedAt}`);

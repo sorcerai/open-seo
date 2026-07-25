@@ -164,22 +164,23 @@ async function discover(
   };
 }
 
-export const hackerNewsDemandSource: DemandSourceAdapter<HackerNewsSourceConfig> = {
-  capabilities: {
-    sourcePlatform: "hacker_news",
-    supportsBackfill: true,
-    supportsIncrementalCursor: true,
-    supportsDeletionSync: false,
-    supportsEngagementSnapshots: true,
-    supportsFullText: true,
-    requiresAuthentication: false,
-    requiresCommercialApproval: false,
-    defaultRawRetentionDays: 30,
-    notes: [
-      "Poll story IDs and rehydrate current item state; do not treat HN as representative of every market.",
-      "Author identity is intentionally not persisted by this adapter.",
-    ],
-  },
-  validateConfig,
-  discover,
-};
+export const hackerNewsDemandSource: DemandSourceAdapter<HackerNewsSourceConfig> =
+  {
+    capabilities: {
+      sourcePlatform: "hacker_news",
+      supportsBackfill: true,
+      supportsIncrementalCursor: true,
+      supportsDeletionSync: false,
+      supportsEngagementSnapshots: true,
+      supportsFullText: true,
+      requiresAuthentication: false,
+      requiresCommercialApproval: false,
+      defaultRawRetentionDays: 30,
+      notes: [
+        "Poll story IDs and rehydrate current item state; do not treat HN as representative of every market.",
+        "Author identity is intentionally not persisted by this adapter.",
+      ],
+    },
+    validateConfig,
+    discover,
+  };

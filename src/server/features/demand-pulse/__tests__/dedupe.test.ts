@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  canonicalizeDemandUrl,
-  compareDemandObservations,
-} from "../dedupe";
+import { canonicalizeDemandUrl, compareDemandObservations } from "../dedupe";
 import type { DemandObservationCandidate } from "../types";
 
 const observation = (

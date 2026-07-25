@@ -35,7 +35,14 @@
     "!.alchemy/**",
     "!badseo/**",
   ],
-  "ignore": ["drizzle-prod.config.ts"],
+  "ignore": [
+    "drizzle-prod.config.ts",
+    // Demand Pulse Phase 0 contracts. Nothing imports them yet by design, so
+    // every file and export reads as unused. Drop this entry as the feature is
+    // wired up (repositories, MCP registration, canary route) — it is scaffolding
+    // for an unwired module, not a permanent exemption.
+    "src/server/features/demand-pulse/**",
+  ],
   // Disable Drizzle plugin - it tries to load drizzle.config.ts which imports cloudflare:workers
   "drizzle": false,
   "ignoreDependencies": [

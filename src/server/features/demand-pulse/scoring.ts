@@ -33,7 +33,10 @@ const round = (value: number, digits = 2): number => {
   return Math.round(value * factor) / factor;
 };
 
-function assertWeightsSumToOne(weights: Record<string, number>, label: string): void {
+function assertWeightsSumToOne(
+  weights: Record<string, number>,
+  label: string,
+): void {
   const total = Object.values(weights).reduce((sum, value) => sum + value, 0);
   if (Math.abs(total - 1) > 0.000_001) {
     throw new Error(`${label} weights must sum to 1; received ${total}`);
@@ -74,7 +77,10 @@ export function scoreDemandFamily(
 
   const positiveScore = positive.score * 100;
   const penaltyScore = penalty.score * penaltyCeilingPoints;
-  const priorityScore = Math.min(100, Math.max(0, positiveScore - penaltyScore));
+  const priorityScore = Math.min(
+    100,
+    Math.max(0, positiveScore - penaltyScore),
+  );
 
   const confidence = clamp01(
     vector.crossSourceDiversity * 0.22 +

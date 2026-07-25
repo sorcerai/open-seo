@@ -121,15 +121,15 @@ Pulse continues through provenance, validation, action selection, and measuremen
 
 ## 5. Users and jobs
 
-| User | Job | Success condition |
-| --- | --- | --- |
-| Site operator | Find emerging demand worth acting on | Top recommendations are useful, not merely interesting |
-| SEO strategist | Merge live language with search opportunity | Each promoted family has provenance, intent, coverage, and action |
-| Content operator | Know whether to update or create | Existing-page update wins are surfaced before new URLs |
-| Product/support lead | Detect failures and objections | Non-content actions appear alongside content actions |
-| Sales lead | Capture repeated objections/comparisons | Evidence can become enablement and offer changes |
-| AI agent | Retrieve demand evidence safely | MCP returns structured, source-labeled, bounded results |
-| Constellation | Receive promoted prompt families | Stable IDs, versions, provenance, and measurement hooks exist |
+| User                 | Job                                         | Success condition                                                 |
+| -------------------- | ------------------------------------------- | ----------------------------------------------------------------- |
+| Site operator        | Find emerging demand worth acting on        | Top recommendations are useful, not merely interesting            |
+| SEO strategist       | Merge live language with search opportunity | Each promoted family has provenance, intent, coverage, and action |
+| Content operator     | Know whether to update or create            | Existing-page update wins are surfaced before new URLs            |
+| Product/support lead | Detect failures and objections              | Non-content actions appear alongside content actions              |
+| Sales lead           | Capture repeated objections/comparisons     | Evidence can become enablement and offer changes                  |
+| AI agent             | Retrieve demand evidence safely             | MCP returns structured, source-labeled, bounded results           |
+| Constellation        | Receive promoted prompt families            | Stable IDs, versions, provenance, and measurement hooks exist     |
 
 ---
 
@@ -232,28 +232,28 @@ observed corroboration.
 
 ## 8. Source strategy and rollout matrix
 
-| Source | Signal | Access pattern | Phase | Main constraints |
-| --- | --- | --- | --- | --- |
-| GSC | first-party search language | existing OpenSEO integration | 0 | sampling, privacy, lag |
-| Manual CSV/JSON | support, sales, site search, calls | upload/import | 0 | schema quality, PII redaction |
-| DataForSEO discussions/forums | source-domain discovery + live threads | existing DataForSEO SERP layer | 0 | cost, SERP coverage, query selection |
-| Hacker News | technology/business questions and launches | public Firebase API | 0 | audience bias, no universal market coverage |
-| DataForSEO Trends | temporal corroboration | existing vendor | 1 | relative values, query ambiguity |
-| DataForSEO reviews | product/local pain and praise | existing vendor | 1 | source coverage, licensing/retention |
-| Discourse | specialist forum topics/posts | per-instance API/OpenAPI | 1 | capabilities and auth vary by site |
-| Stack Exchange | expert questions and recurring problems | official API | 1 | quota, backoff, limited broad search |
-| GitHub Issues | software failures and feature requests | REST API | 1 | PRs mixed into issue listing; repo bias |
-| GitHub Discussions | product/community decisions | GraphQL API | 1 | permissions, pagination, repository scope |
-| YouTube comments | authentic objections, how-to failures | official Data API | 1 | quota, moderation/deleted comments |
-| Reddit | broad consumer/problem language | approved Data API | 2 | commercial approval, deletion, retention, terms |
-| Bluesky | emerging public discourse | public API/firehose | 2 | firehose volume, moderation labels, deletion |
-| Mastodon | niche/federated communities | per-instance APIs | 2 | no global recall, instance auth/search differences |
-| Product Hunt | launch reactions | official/approved access | 2 | launch-heavy bias |
-| App stores | product failure/review language | approved APIs/providers | 2 | store terms, review manipulation |
-| RSS/changelogs/advisories | event-driven demand | feeds and official pages | 2 | entity matching, false event relevance |
-| Owned Discord/Slack | customer language | permissioned bot/export | 2 | privacy, consent, workspace policies |
-| TikTok/Instagram/Threads/X | trend/comment language | official or licensed access only | later | cost, restrictive APIs, high manipulation risk |
-| Facebook Groups/LinkedIn/Quora | potentially useful private/niche language | no scraping in v1 | excluded by default | access, privacy, terms, brittleness |
+| Source                         | Signal                                     | Access pattern                   | Phase               | Main constraints                                   |
+| ------------------------------ | ------------------------------------------ | -------------------------------- | ------------------- | -------------------------------------------------- |
+| GSC                            | first-party search language                | existing OpenSEO integration     | 0                   | sampling, privacy, lag                             |
+| Manual CSV/JSON                | support, sales, site search, calls         | upload/import                    | 0                   | schema quality, PII redaction                      |
+| DataForSEO discussions/forums  | source-domain discovery + live threads     | existing DataForSEO SERP layer   | 0                   | cost, SERP coverage, query selection               |
+| Hacker News                    | technology/business questions and launches | public Firebase API              | 0                   | audience bias, no universal market coverage        |
+| DataForSEO Trends              | temporal corroboration                     | existing vendor                  | 1                   | relative values, query ambiguity                   |
+| DataForSEO reviews             | product/local pain and praise              | existing vendor                  | 1                   | source coverage, licensing/retention               |
+| Discourse                      | specialist forum topics/posts              | per-instance API/OpenAPI         | 1                   | capabilities and auth vary by site                 |
+| Stack Exchange                 | expert questions and recurring problems    | official API                     | 1                   | quota, backoff, limited broad search               |
+| GitHub Issues                  | software failures and feature requests     | REST API                         | 1                   | PRs mixed into issue listing; repo bias            |
+| GitHub Discussions             | product/community decisions                | GraphQL API                      | 1                   | permissions, pagination, repository scope          |
+| YouTube comments               | authentic objections, how-to failures      | official Data API                | 1                   | quota, moderation/deleted comments                 |
+| Reddit                         | broad consumer/problem language            | approved Data API                | 2                   | commercial approval, deletion, retention, terms    |
+| Bluesky                        | emerging public discourse                  | public API/firehose              | 2                   | firehose volume, moderation labels, deletion       |
+| Mastodon                       | niche/federated communities                | per-instance APIs                | 2                   | no global recall, instance auth/search differences |
+| Product Hunt                   | launch reactions                           | official/approved access         | 2                   | launch-heavy bias                                  |
+| App stores                     | product failure/review language            | approved APIs/providers          | 2                   | store terms, review manipulation                   |
+| RSS/changelogs/advisories      | event-driven demand                        | feeds and official pages         | 2                   | entity matching, false event relevance             |
+| Owned Discord/Slack            | customer language                          | permissioned bot/export          | 2                   | privacy, consent, workspace policies               |
+| TikTok/Instagram/Threads/X     | trend/comment language                     | official or licensed access only | later               | cost, restrictive APIs, high manipulation risk     |
+| Facebook Groups/LinkedIn/Quora | potentially useful private/niche language  | no scraping in v1                | excluded by default | access, privacy, terms, brittleness                |
 
 ### 8.1 Why DataForSEO starts first
 
@@ -543,32 +543,32 @@ Every component is normalized to `[0, 1]` and stored with its derivation.
 
 ### 13.1 Positive dimensions
 
-| Dimension | Meaning |
-| --- | --- |
-| Cross-source diversity | Independent source/platform/class support |
-| Commercial proximity | Distance to purchase, retention, lead, or costly problem |
-| First-party corroboration | Support/sales/GSC/customer evidence |
-| Search corroboration | Suggest/PAA/Trends/volume/SERP support |
-| Normalized velocity | Engagement or recurrence versus source baseline per time |
-| Recurrence | Repeated independent observations |
-| Coverage gap | Current site/product/support answer is absent or inadequate |
-| Source reliability | Historical precision and moderation quality |
-| ICP fit | Match to market, geography, product, and customer profile |
-| Persistence | Survives beyond a one-day spike |
-| AI-surface corroboration | Appears in observed prompts, answers, or citations |
-| Decision clarity | Clear problem, choice, or desired outcome |
-| Trend acceleration | Rate of increase versus prior window |
+| Dimension                 | Meaning                                                     |
+| ------------------------- | ----------------------------------------------------------- |
+| Cross-source diversity    | Independent source/platform/class support                   |
+| Commercial proximity      | Distance to purchase, retention, lead, or costly problem    |
+| First-party corroboration | Support/sales/GSC/customer evidence                         |
+| Search corroboration      | Suggest/PAA/Trends/volume/SERP support                      |
+| Normalized velocity       | Engagement or recurrence versus source baseline per time    |
+| Recurrence                | Repeated independent observations                           |
+| Coverage gap              | Current site/product/support answer is absent or inadequate |
+| Source reliability        | Historical precision and moderation quality                 |
+| ICP fit                   | Match to market, geography, product, and customer profile   |
+| Persistence               | Survives beyond a one-day spike                             |
+| AI-surface corroboration  | Appears in observed prompts, answers, or citations          |
+| Decision clarity          | Clear problem, choice, or desired outcome                   |
+| Trend acceleration        | Rate of increase versus prior window                        |
 
 ### 13.2 Penalties
 
-| Penalty | Meaning |
-| --- | --- |
-| Spam/manipulation risk | Bots, brigading, affiliate spam, coordinated promotion |
-| Legal/retention risk | Source terms, personal data, deletion, licensing ambiguity |
-| Cannibalization risk | New page would overlap a stronger canonical page |
-| Staleness risk | Issue already obsolete or resolved |
-| Source concentration | Most evidence comes from one community or one repost chain |
-| Uncertainty | Weak extraction, ambiguous identity, sparse evidence |
+| Penalty                | Meaning                                                    |
+| ---------------------- | ---------------------------------------------------------- |
+| Spam/manipulation risk | Bots, brigading, affiliate spam, coordinated promotion     |
+| Legal/retention risk   | Source terms, personal data, deletion, licensing ambiguity |
+| Cannibalization risk   | New page would overlap a stronger canonical page           |
+| Staleness risk         | Issue already obsolete or resolved                         |
+| Source concentration   | Most evidence comes from one community or one repost chain |
+| Uncertainty            | Weak extraction, ambiguous identity, sparse evidence       |
 
 ### 13.3 Default formula
 
@@ -726,15 +726,15 @@ Before recommending a new URL:
 
 ### 17.2 Action examples
 
-| Evidence pattern | Preferred action |
-| --- | --- |
-| Same objection appears in sales and reviews | offer/copy update + sales enablement |
-| Product failure after new release | support article/troubleshooter, not SEO essay |
-| Repeated comparison with clear SERP demand | comparison page or section |
-| Existing page ranks but omits new sub-question | update existing page |
-| High-intent calculation repeated | calculator/tool |
-| Viral one-off, weak ICP fit | monitor/reject |
-| Strong community pain, zero search volume | support/product/email test before new page |
+| Evidence pattern                               | Preferred action                              |
+| ---------------------------------------------- | --------------------------------------------- |
+| Same objection appears in sales and reviews    | offer/copy update + sales enablement          |
+| Product failure after new release              | support article/troubleshooter, not SEO essay |
+| Repeated comparison with clear SERP demand     | comparison page or section                    |
+| Existing page ranks but omits new sub-question | update existing page                          |
+| High-intent calculation repeated               | calculator/tool                               |
+| Viral one-off, weak ICP fit                    | monitor/reject                                |
+| Strong community pain, zero search volume      | support/product/email test before new page    |
 
 ---
 
@@ -756,7 +756,11 @@ community bodies by default.
   "evidence_summary": {
     "observations": 18,
     "independent_sources": 6,
-    "classes": ["community_observed", "search_observed", "first_party_observed"],
+    "classes": [
+      "community_observed",
+      "search_observed",
+      "first_party_observed"
+    ],
     "first_observed_at": "2026-05-04T00:00:00Z",
     "last_observed_at": "2026-07-24T00:00:00Z"
   },
@@ -766,7 +770,11 @@ community bodies by default.
     "confidence": 0.78
   },
   "provenance": [
-    { "observation_id": "obs_1", "source_class": "community_observed", "url": "https://example.com/thread" }
+    {
+      "observation_id": "obs_1",
+      "source_class": "community_observed",
+      "url": "https://example.com/thread"
+    }
   ]
 }
 ```
@@ -1191,26 +1199,26 @@ Promotion target:
 
 ### 27.1 Signal quality
 
-| KPI | Target |
-| --- | ---: |
-| Top-20 human approval | ≥80% |
-| Promoted families with ≥2 evidence classes | ≥75% |
-| Provenance completeness | 100% |
-| Duplicate collapse precision | ≥90% |
-| Cross-posts incorrectly counted independent | <5% |
-| Recommendations with explicit action | 100% |
-| Recommendations defaulting to new page | <50%, tracked not gamed |
+| KPI                                         |                  Target |
+| ------------------------------------------- | ----------------------: |
+| Top-20 human approval                       |                    ≥80% |
+| Promoted families with ≥2 evidence classes  |                    ≥75% |
+| Provenance completeness                     |                    100% |
+| Duplicate collapse precision                |                    ≥90% |
+| Cross-posts incorrectly counted independent |                     <5% |
+| Recommendations with explicit action        |                    100% |
+| Recommendations defaulting to new page      | <50%, tracked not gamed |
 
 ### 27.2 Operational
 
-| KPI | Target |
-| --- | ---: |
-| Run idempotency | 100% |
-| Source run success | ≥98% excluding documented upstream outages |
-| Unbounded cost incidents | 0 |
-| Retention/deletion SLA misses | 0 critical |
-| MCP p95 read latency | <3 seconds excluding live discovery |
-| Feature-related regression to existing OpenSEO workflows | 0 |
+| KPI                                                      |                                     Target |
+| -------------------------------------------------------- | -----------------------------------------: |
+| Run idempotency                                          |                                       100% |
+| Source run success                                       | ≥98% excluding documented upstream outages |
+| Unbounded cost incidents                                 |                                          0 |
+| Retention/deletion SLA misses                            |                                 0 critical |
+| MCP p95 read latency                                     |        <3 seconds excluding live discovery |
+| Feature-related regression to existing OpenSEO workflows |                                          0 |
 
 ### 27.3 Commercial/outcome
 
@@ -1232,32 +1240,32 @@ metrics that reward typing.
 
 ## 28. Unknown unknowns and mitigations
 
-| Unknown | Failure mode | Mitigation |
-| --- | --- | --- |
-| New source domains emerge | fixed adapters miss niche demand | SERP source discovery + source registry |
-| Search volume remains zero | valuable latent demand gets discarded | preserve first-party/community evidence and alternative actions |
-| Viral entertainment dominates | irrelevant topics rank high | commercial/ICP/coverage scoring + normalization |
-| Cross-post campaign | fake source diversity | cross-post/syndication graph |
-| Quiet specialist forum | low raw engagement undervalued | source percentile + recurrence |
-| Platform API/terms change | collector breaks or becomes noncompliant | capability/terms version probe + circuit breaker |
-| Deleted content persists internally | legal/privacy breach | deletion queue + TTL + rehydration model |
-| LLM extraction drifts | families/scoring change silently | model revision + gold set + shadow evaluation |
-| Multilingual false merges | wrong market action | translation sibling edges + locale-specific evidence |
-| Product launch/outage regime | evergreen workflow reacts too slowly | market-event triggers and shorter windows |
-| Existing page is “about” topic but does not answer it | false coverage | answer-level coverage evaluation |
-| Competitor astroturfing | manipulation enters roadmap | spam/source concentration penalties |
-| Review bombing | false negative demand spike | platform anomaly and independent evidence gate |
-| First-party data includes PII | privacy exposure | import redaction + bounded fields + retention controls |
-| Publishing affects observed demand | misleading causal claims | action timestamps + control comparisons |
-| Source outage creates apparent decay | false trend decline | source health-aware missingness |
-| Cost grows with projects/seeds | margin erosion | source/day/project budgets + cache + tiered cadence |
-| Family taxonomy explodes | unusable UI and unstable IDs | merge/split governance + frozen canonical IDs |
-| One page covers many families | action duplication | prompt-to-page graph and grouped work orders |
-| One family needs multiple actions | under-scoped recommendation | primary action + ordered secondary actions |
-| “Current concern” is already resolved | stale content | staleness/version/event checks |
-| Forum is indexed but terms prohibit reuse | compliance risk | source policy before excerpt retention |
-| API key exists but commercial approval does not | false sense of readiness | separate auth, terms, and compliance statuses |
-| Model-generated candidates dominate | plausible junk returns | generated evidence class cannot promote alone |
+| Unknown                                               | Failure mode                             | Mitigation                                                      |
+| ----------------------------------------------------- | ---------------------------------------- | --------------------------------------------------------------- |
+| New source domains emerge                             | fixed adapters miss niche demand         | SERP source discovery + source registry                         |
+| Search volume remains zero                            | valuable latent demand gets discarded    | preserve first-party/community evidence and alternative actions |
+| Viral entertainment dominates                         | irrelevant topics rank high              | commercial/ICP/coverage scoring + normalization                 |
+| Cross-post campaign                                   | fake source diversity                    | cross-post/syndication graph                                    |
+| Quiet specialist forum                                | low raw engagement undervalued           | source percentile + recurrence                                  |
+| Platform API/terms change                             | collector breaks or becomes noncompliant | capability/terms version probe + circuit breaker                |
+| Deleted content persists internally                   | legal/privacy breach                     | deletion queue + TTL + rehydration model                        |
+| LLM extraction drifts                                 | families/scoring change silently         | model revision + gold set + shadow evaluation                   |
+| Multilingual false merges                             | wrong market action                      | translation sibling edges + locale-specific evidence            |
+| Product launch/outage regime                          | evergreen workflow reacts too slowly     | market-event triggers and shorter windows                       |
+| Existing page is “about” topic but does not answer it | false coverage                           | answer-level coverage evaluation                                |
+| Competitor astroturfing                               | manipulation enters roadmap              | spam/source concentration penalties                             |
+| Review bombing                                        | false negative demand spike              | platform anomaly and independent evidence gate                  |
+| First-party data includes PII                         | privacy exposure                         | import redaction + bounded fields + retention controls          |
+| Publishing affects observed demand                    | misleading causal claims                 | action timestamps + control comparisons                         |
+| Source outage creates apparent decay                  | false trend decline                      | source health-aware missingness                                 |
+| Cost grows with projects/seeds                        | margin erosion                           | source/day/project budgets + cache + tiered cadence             |
+| Family taxonomy explodes                              | unusable UI and unstable IDs             | merge/split governance + frozen canonical IDs                   |
+| One page covers many families                         | action duplication                       | prompt-to-page graph and grouped work orders                    |
+| One family needs multiple actions                     | under-scoped recommendation              | primary action + ordered secondary actions                      |
+| “Current concern” is already resolved                 | stale content                            | staleness/version/event checks                                  |
+| Forum is indexed but terms prohibit reuse             | compliance risk                          | source policy before excerpt retention                          |
+| API key exists but commercial approval does not       | false sense of readiness                 | separate auth, terms, and compliance statuses                   |
+| Model-generated candidates dominate                   | plausible junk returns                   | generated evidence class cannot promote alone                   |
 
 ---
 
