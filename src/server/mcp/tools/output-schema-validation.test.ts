@@ -154,6 +154,55 @@ describe("DataForSEO research tool output schemas", () => {
 
     expect(result.success).toBe(true);
   });
+
+  it("get_domain_overview requires metric availability labels", async () => {
+    const { getDomainOverviewTool } = await import("./get-domain-overview");
+    const schema = normalizeObjectSchema(
+      getDomainOverviewTool.config.outputSchema,
+    );
+    if (!schema) throw new Error("output schema did not normalize");
+
+    const basePayload = {
+      domain: "example.com",
+      organicTraffic: null,
+      organicKeywords: 42,
+      backlinks: null,
+      referringDomains: null,
+    };
+    const dataAvailability = {
+      organicTraffic: "unavailable",
+      organicKeywords: "available",
+      backlinks: "not_queried",
+      referringDomains: "not_queried",
+    } as const;
+    expect((await safeParseAsync(schema, basePayload)).success).toBe(false);
+    expect(
+      (
+        await safeParseAsync(schema, {
+          ...basePayload,
+          dataAvailability,
+        })
+      ).success,
+    ).toBe(true);
+    expect(
+      (
+        await safeParseAsync(schema, {
+          ...basePayload,
+          backlinks: 900,
+          dataAvailability,
+        })
+      ).success,
+    ).toBe(false);
+    expect(
+      (
+        await safeParseAsync(schema, {
+          ...basePayload,
+          referringDomains: 300,
+          dataAvailability,
+        })
+      ).success,
+    ).toBe(false);
+  });
 });
 
 describe("get_backlinks_profile MCP tool", () => {

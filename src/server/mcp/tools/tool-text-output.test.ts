@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
   profileReferringDomainsPage: vi.fn(),
   profileBacklinksPage: vi.fn(),
   getSuggestedKeywords: vi.fn(),
+  getOverview: vi.fn(),
   getConfigById: vi.fn(),
   getConfigsForProject: vi.fn(),
   getLatestResults: vi.fn(),
@@ -41,7 +42,10 @@ vi.mock("@/server/features/backlinks/services/BacklinksService", () => ({
   },
 }));
 vi.mock("@/server/features/domain/services/DomainService", () => ({
-  DomainService: { getSuggestedKeywords: mocks.getSuggestedKeywords },
+  DomainService: {
+    getOverview: mocks.getOverview,
+    getSuggestedKeywords: mocks.getSuggestedKeywords,
+  },
 }));
 vi.mock(
   "@/server/features/rank-tracking/repositories/RankTrackingRepository",
@@ -156,6 +160,45 @@ describe("MCP tool text output (service-backed tools)", () => {
     const out = text(result);
     expect(out).toContain("keyword | position | volume | KD");
     expect(out).toContain("seo audit | 4 | 880 | 22");
+  });
+
+  it("get_domain_overview labels unavailable and unqueried metrics", async () => {
+    mocks.getOverview.mockResolvedValue({
+      domain: "example.com",
+      organicTraffic: null,
+      organicKeywords: 42,
+      backlinks: 900,
+      referringDomains: 300,
+      hasData: true,
+      fetchedAt: "2026-07-22T00:00:00.000Z",
+    });
+    const { getDomainOverviewTool } = await import("./get-domain-overview");
+
+    const result = await getDomainOverviewTool.handler(
+      {
+        projectId: "project_1",
+        domain: "example.com",
+        includeSubdomains: false,
+      },
+      toolExtra,
+    );
+
+    expect(result.structuredContent?.dataAvailability).toEqual({
+      organicTraffic: "unavailable",
+      organicKeywords: "available",
+      backlinks: "not_queried",
+      referringDomains: "not_queried",
+    });
+    expect(result.structuredContent?.backlinks).toBeNull();
+    expect(result.structuredContent?.referringDomains).toBeNull();
+    expect(text(result)).toContain("Organic traffic: unavailable");
+    expect(text(result)).toContain("Organic keywords: 42");
+    expect(text(result)).toContain(
+      "Backlinks: not queried; call get_backlinks_overview",
+    );
+    expect(text(result)).toContain(
+      "Referring domains: not queried; call get_backlinks_overview",
+    );
   });
 
   it("get_backlinks_overview renders all referring-domain rows", async () => {

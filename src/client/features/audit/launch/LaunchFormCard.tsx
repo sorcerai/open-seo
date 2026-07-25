@@ -70,13 +70,14 @@ export function LaunchFormCard({
             )}
           </launchForm.Subscribe>
 
-          <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:col-span-12 lg:items-start">
+          <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-3 lg:col-span-12 lg:items-start">
             <LaunchOptions
               launchForm={launchForm}
               commitMaxPagesInput={commitMaxPagesInput}
               maxPagesLimit={maxPagesLimit}
             />
             <LighthouseOptions launchForm={launchForm} />
+            <AiCrawlerLiveCheckOptions launchForm={launchForm} />
           </div>
         </form>
 
@@ -177,6 +178,32 @@ function LighthouseOptions({ launchForm }: Pick<Props, "launchForm">) {
           ) : null
         }
       </launchForm.Subscribe>
+    </div>
+  );
+}
+
+function AiCrawlerLiveCheckOptions({ launchForm }: Pick<Props, "launchForm">) {
+  return (
+    <div className="rounded-lg border border-base-300 bg-base-200/20 p-3 space-y-2">
+      <label className="label cursor-pointer justify-start gap-2 p-0">
+        <launchForm.Field name="runAiCrawlerLiveCheck">
+          {(field) => (
+            <input
+              type="checkbox"
+              className="toggle toggle-sm toggle-primary"
+              checked={Boolean(field.state.value)}
+              onChange={(event) => field.handleChange(event.target.checked)}
+            />
+          )}
+        </launchForm.Field>
+        <span className="text-sm font-medium text-base-content/80">
+          Test AI crawler access
+        </span>
+      </label>
+      <p className="text-xs text-base-content/60">
+        Makes multiple requests to the start page with known crawler user agents
+        to detect live WAF or CDN responses. Off by default.
+      </p>
     </div>
   );
 }

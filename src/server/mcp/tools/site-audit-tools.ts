@@ -59,6 +59,12 @@ const runInputSchema = {
     .describe(
       "Run Lighthouse on a sample of up to 10 representative pages (default true).",
     ),
+  runAiCrawlerLiveCheck: z
+    .boolean()
+    .optional()
+    .describe(
+      "Impersonate known AI crawlers against the start URL to detect runtime WAF blocks and content differences (default false). This makes additional requests to the audited site.",
+    ),
 } as const;
 
 type RunArgs = z.infer<z.ZodObject<typeof runInputSchema>>;
@@ -96,6 +102,7 @@ export const runSiteAuditTool = {
         startUrl: args.url,
         maxPages: args.maxPages,
         lighthouseStrategy,
+        runAiCrawlerLiveCheck: args.runAiCrawlerLiveCheck ?? false,
         limitTier,
       }));
     } catch (error) {

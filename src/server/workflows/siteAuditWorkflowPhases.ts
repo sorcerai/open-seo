@@ -1,6 +1,10 @@
 import type { WorkflowStep } from "cloudflare:workers";
 import type { BillingCustomerContext } from "@/server/billing/subscription";
-import { discoverUrls, parseRobotsTxt } from "@/server/lib/audit/discovery";
+import {
+  discoverUrls,
+  fetchRobotsTxtText,
+  parseRobotsTxt,
+} from "@/server/lib/audit/discovery";
 import {
   fetchAndStoreLighthouseResult,
   selectLighthouseSample,
@@ -10,6 +14,15 @@ import { AuditRepository } from "@/server/features/audit/repositories/AuditRepos
 import { AuditProgressKV } from "@/server/lib/audit/progress-kv";
 import { runMultipageChecks } from "@/server/lib/audit/issues/multipage";
 import type { AuditConfig } from "@/server/lib/audit/types";
+import { interpretAiCrawlerPolicy } from "@/server/lib/audit/aiCrawlerPolicyInterpretation";
+import {
+  generateAiCrawlerFindings,
+  toDetectedIssues,
+} from "@/server/lib/audit/aiCrawlerPolicyFindings";
+import {
+  liveCheckAiCrawlers,
+  toLiveDetectedIssues,
+} from "@/server/lib/audit/aiCrawlerPolicyLive";
 import { captureServerEvent } from "@/server/lib/posthog";
 import {
   runCrawlPhase,
@@ -71,6 +84,30 @@ export async function runAuditPhases(
   // robots rules the original run used (a live re-fetch could differ and
   // desync the frontier from already-persisted crawl batches).
   const robots = parseRobotsTxt(origin, discovery.robotsText);
+
+  // AI-crawler policy analysis runs from the same checkpointed robots text.
+  // Independent of crawl results so issues surface even if the crawl fails.
+  await pgStep(step, "ai-crawler-analysis", undefined, async () => {
+    const policy = interpretAiCrawlerPolicy(discovery.robotsText);
+    const findings = generateAiCrawlerFindings(policy);
+    const issues = toDetectedIssues(findings, `${origin}/robots.txt`);
+    if (issues.length > 0) {
+      await AuditRepository.insertIssues(auditId, issues);
+    }
+    return { issueCount: issues.length };
+  });
+  if (config.runAiCrawlerLiveCheck) {
+    const liveResult = await step.do("ai-crawler-live-probe", () =>
+      liveCheckAiCrawlers(startUrl),
+    );
+    await pgStep(step, "ai-crawler-live-issues", undefined, async () => {
+      const issues = toLiveDetectedIssues(liveResult, startUrl);
+      if (issues.length > 0) {
+        await AuditRepository.insertIssues(auditId, issues);
+      }
+      return { issueCount: issues.length };
+    });
+  }
   const crawl = await runCrawlPhase(step, {
     auditId,
     workflowInstanceId,
@@ -108,17 +145,18 @@ async function runDiscoveryPhase(
   origin: string,
   maxPages: number,
 ) {
-  return pgStep(step, "discover-urls", undefined, async () => {
-    const result = await discoverUrls(origin, maxPages);
+  const robotsText = await step.do("fetch-robots", () =>
+    fetchRobotsTxtText(origin),
+  );
+  const discovery = await pgStep(step, "discover-urls", undefined, async () => {
+    const result = await discoverUrls(origin, maxPages, robotsText);
     await AuditRepository.updateAuditProgress(auditId, workflowInstanceId, {
       pagesTotal: Math.min(result.urls.length + 1, maxPages),
       currentPhase: "crawling",
     });
-    return {
-      sitemapUrls: capSitemapSeeds(result.urls, maxPages),
-      robotsText: result.robotsText,
-    };
+    return { sitemapUrls: capSitemapSeeds(result.urls, maxPages) };
   });
+  return { ...discovery, robotsText };
 }
 
 type LighthousePhaseParams = {

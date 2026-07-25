@@ -232,6 +232,140 @@ export const AUDIT_ISSUE_TYPES = {
     howToFix:
       "Add links from higher-level pages (hubs, category pages, navigation) to flatten the path to this page.",
   },
+  "ai-crawler-no-robots-txt": {
+    severity: "warning",
+    title: "robots.txt missing — AI crawler policy undetermined",
+    explanation:
+      "Without a reachable robots.txt, OpenSEO cannot determine whether AI crawlers (GPTBot, ClaudeBot, OAI-SearchBot, PerplexityBot, etc.) are allowed to access the site. This means the AI-visibility assessment is incomplete.",
+    howToFix:
+      "Add a robots.txt at the site origin (e.g. https://example.com/robots.txt) and verify it returns HTTP 200. Even an empty file is better than none — it establishes a baseline policy.",
+  },
+  "ai-crawler-all-search-blocked": {
+    severity: "critical",
+    title: "Modeled AI search crawlers blocked at the site root",
+    explanation:
+      "OAI-SearchBot, Claude-SearchBot, and PerplexityBot are blocked from the site root in robots.txt. This can remove citation eligibility on those vendors' search surfaces; it does not cover Googlebot or every AI search engine.",
+    howToFix:
+      "Review root Disallow rules for these three crawlers. Allow only the vendor search crawlers you intend to support.",
+  },
+  "ai-crawler-search-bot-blocked": {
+    severity: "critical",
+    title: "AI search crawler explicitly blocked",
+    explanation:
+      "An AI search crawler is explicitly blocked via Disallow in robots.txt. Blocking search-purpose bots (OAI-SearchBot, Claude-SearchBot, PerplexityBot) removes the site from that vendor's AI search citations.",
+    howToFix:
+      "Remove the Disallow rule for the blocked bot to restore AI search citation visibility for that platform.",
+  },
+  "ai-crawler-search-bot-wildcard": {
+    severity: "critical",
+    title: "AI search crawler blocked by wildcard rule",
+    explanation:
+      "An AI search crawler is blocked by a wildcard User-agent: * Disallow rule rather than an explicit block. This is often unintentional — the site owner may not realize the blanket rule also blocks AI search bots.",
+    howToFix:
+      "Add an explicit Allow for the affected bot, or narrow the wildcard Disallow so it does not apply to AI search crawlers.",
+  },
+  "ai-crawler-search-bot-default": {
+    severity: "info",
+    title: "AI search crawler allowed at the site root by default",
+    explanation:
+      "No applicable robots.txt rule blocks this crawler at the site root. This permits root crawling by default; it does not guarantee indexing or citation.",
+    howToFix:
+      "No action needed. Optionally add an explicit Allow rule to document crawl intent.",
+  },
+  "ai-crawler-training-bot-blocked": {
+    severity: "warning",
+    title: "AI training crawler blocked",
+    explanation:
+      "A training-purpose AI crawler (e.g. GPTBot, ClaudeBot, Google-Extended) is blocked. This is a deliberate IP/training-use choice — it does not affect AI search citation. Note: Google-Extended controls generative-AI training eligibility but does NOT control Google AI Overviews.",
+    howToFix:
+      "Review whether blocking this training bot is intended. If you want your content eligible for a vendor's generative-AI training, allow the bot.",
+  },
+  "ai-crawler-user-bot-blocked": {
+    severity: "warning",
+    title: "AI user-initiated fetch blocked",
+    explanation:
+      "A user-initiated AI fetch bot (e.g. ChatGPT-User, Claude-User, Perplexity-User) is blocked. These bots fetch pages when a user explicitly asks an AI to read a specific URL. Blocking them prevents AI assistants from accessing your content on demand.",
+    howToFix:
+      "Review whether blocking user-initiated fetch is intended. Allowing it lets AI assistants read your pages when users share or request them.",
+  },
+  "ai-crawler-ads-bot-blocked": {
+    severity: "warning",
+    title: "AI ads crawler blocked",
+    explanation:
+      "An ads-purpose AI crawler (e.g. OAI-AdsBot) is blocked. Ads bots support ad landing-page safety and relevance checks — blocking them is not a training permission and has minimal SEO impact.",
+    howToFix: "Review whether blocking this ads bot is intended.",
+  },
+  "ai-crawler-content-signal-blocked": {
+    severity: "warning",
+    title: "Content-Signal denies an AI content use",
+    explanation:
+      "A valid Content-Signal directive sets search, ai-input, or ai-train to no. This is an explicit policy choice and can limit the corresponding AI use.",
+    howToFix:
+      "Review whether the denial is intended. Change the value to yes only if you want to permit that use.",
+  },
+  "ai-crawler-content-signal-conflict": {
+    severity: "warning",
+    title: "Content-Signal directive has conflicting values",
+    explanation:
+      "A Cloudflare Content-Signal directive in robots.txt has both yes and no values for the same key, making the policy uninterpretable. This degrades the reliability of the AI-visibility assessment.",
+    howToFix:
+      "Resolve the Content-Signal conflict so only one value (yes or no) appears for each key.",
+  },
+  "ai-crawler-content-signal-invalid": {
+    severity: "info",
+    title: "Content-Signal directive has unrecognized value",
+    explanation:
+      "A Cloudflare Content-Signal directive uses a value other than yes or no, which is not recognized by the parser.",
+    howToFix: "Use only yes or no as Content-Signal values.",
+  },
+  "ai-crawler-aipref-blocked": {
+    severity: "warning",
+    title: "AIPREF / Content-Usage denies an AI content use",
+    explanation:
+      "A valid AIPREF or Content-Usage directive sets search or train-ai to n. This is an explicit policy choice for the corresponding AI use.",
+    howToFix:
+      "Review whether the denial is intended. Change the value to y only if you want to permit that use.",
+  },
+  "ai-crawler-aipref-invalid": {
+    severity: "info",
+    title: "AIPREF / Content-Usage directive is malformed",
+    explanation:
+      "An IETF AIPREF or Content-Usage directive in robots.txt is malformed and could not be parsed. Known keys are train-ai and search with values y or n.",
+    howToFix:
+      "Format AIPREF statements as key=value pairs using y/n for train-ai and search (e.g. Content-Usage: train-ai=y, search=n).",
+  },
+  "ai-crawler-live-search-blocked": {
+    severity: "warning",
+    title: "Crawler User-Agent probe was blocked",
+    explanation:
+      "OpenSEO's request using an AI search crawler's User-Agent received a non-2xx or bot-challenge response. This tests User-Agent handling from OpenSEO's network; it does not emulate or verify the vendor crawler's source IP.",
+    howToFix:
+      "Review CDN, WAF, and bot-management logs for this probe. Confirm the real vendor crawler separately using its documented IP or reverse-DNS verification before changing access rules.",
+  },
+  "ai-crawler-live-bot-blocked": {
+    severity: "warning",
+    title: "Crawler User-Agent probe was blocked",
+    explanation:
+      "OpenSEO's request using a non-search AI crawler's User-Agent received a non-2xx or bot-challenge response. This tests User-Agent handling from OpenSEO's network, not the vendor crawler's verified identity.",
+    howToFix:
+      "Review whether this response is intentional, then confirm the real vendor crawler separately using its documented identity-verification method before changing access rules.",
+  },
+  "ai-crawler-live-content-mismatch": {
+    severity: "warning",
+    title: "AI crawler receives substantially different content",
+    explanation:
+      "The crawler received a successful response whose body was less than half the size of the normal-browser baseline. The site may be serving truncated, challenged, or materially different content to that crawler.",
+    howToFix:
+      "Compare the normal-browser and crawler responses, including CDN and application routing rules. Serve equivalent public content unless the difference is intentional.",
+  },
+  "ai-crawler-live-probe-error": {
+    severity: "info",
+    title: "AI crawler live probe could not complete",
+    explanation:
+      "OpenSEO could not complete a live request using this crawler's User-Agent, so runtime accessibility could not be determined. This does not prove the crawler is blocked.",
+    howToFix:
+      "Check the recorded error and site availability, then rerun the audit. Review network or rate-limit rules if the error persists.",
+  },
 } as const satisfies Record<string, AuditIssueDescriptor>;
 
 export type AuditIssueType = keyof typeof AUDIT_ISSUE_TYPES;
