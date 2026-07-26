@@ -151,7 +151,11 @@ async function resolveAddressRecords(
     },
   );
 
-  if (!response.ok) return [];
+  // Throw rather than return []: an unanswered lookup must not be mistaken for
+  // "resolved, no addresses". The caller fails closed on a throw.
+  if (!response.ok) {
+    throw new Error(`DoH lookup failed for ${hostname} (${response.status})`);
+  }
 
   const body: DnsJsonResponse = await response.json();
   if (body.Status !== 0 || !Array.isArray(body.Answer)) return [];
@@ -182,7 +186,9 @@ async function hostnameResolvesToBlockedAddress(
       (address) => isPrivateIpv4(address) || isPrivateIpv6(address),
     );
   } catch {
-    return false;
+    // Fail closed. A resolver timeout or outage means we cannot prove the host
+    // is public, and treating "unknown" as safe is a DNS-rebinding hole.
+    return true;
   }
 }
 
