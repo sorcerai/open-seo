@@ -117,7 +117,10 @@ export type ContentSignalsResult = Record<ContentSignalKey, ContentSignalEntry>;
 export interface AiprefResult {
   state: AiprefState;
   preferences: Partial<
-    Record<"train-ai" | "search", "allowed" | "disallowed" | "unknown">
+    Record<
+      "train-ai" | "search",
+      "allowed" | "disallowed" | "unknown" | "conflict"
+    >
   >;
   /** Non-standard keys we did not reject — preserved for forward-compat. */
   extensions: Record<string, string>;
@@ -397,8 +400,13 @@ export function parseAipref(robotsText: string): AiprefResult {
         continue;
       }
       if (key === "train-ai" || key === "search") {
-        preferences[key] =
+        const resolved =
           value === "y" ? "allowed" : value === "n" ? "disallowed" : "unknown";
+        const prior = preferences[key];
+        // Contradictory repeats are a conflict, not a last-write-wins race —
+        // otherwise reversing two lines flips the verdict. Sticky once set.
+        preferences[key] =
+          prior !== undefined && prior !== resolved ? "conflict" : resolved;
       } else if (
         key !== "__proto__" &&
         key !== "constructor" &&

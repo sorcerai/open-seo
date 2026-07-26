@@ -35,6 +35,40 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+describe("liveCheckAiCrawlers SSRF boundary", () => {
+  it("validates the initial target, not just redirect hops", async () => {
+    validateUrlMock.mockRejectedValueOnce(
+      Object.assign(new Error("blocked"), { code: "CRAWL_TARGET_BLOCKED" }),
+    );
+    stubFetch(() => mockResponse(200, "should never be fetched"));
+
+    await expect(
+      liveCheckAiCrawlers("http://169.254.169.254/latest/meta-data/"),
+    ).rejects.toMatchObject({ code: "CRAWL_TARGET_BLOCKED" });
+    expect(validateUrlMock).toHaveBeenCalledWith(
+      "http://169.254.169.254/latest/meta-data/",
+    );
+    expect(fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("liveCheckAiCrawlers summary", () => {
+  it("does not claim every probe passed when a probe errored", async () => {
+    const firstBot = Object.values(BOT_USER_AGENTS)[0];
+    stubFetch((ua) => {
+      if (ua === firstBot) throw new Error("connection reset");
+      return mockResponse(200, "<html>body</html>");
+    });
+
+    const result = await liveCheckAiCrawlers("https://example.com/");
+
+    expect(result.summary).not.toBe(
+      "All crawler-UA probes received 2xx responses",
+    );
+    expect(result.summary).toMatch(/error/i);
+  });
+});
+
 describe("BOT_USER_AGENTS", () => {
   it("provides UA strings for taxonomy bots", () => {
     expect(Object.keys(BOT_USER_AGENTS).length).toBeGreaterThanOrEqual(8);

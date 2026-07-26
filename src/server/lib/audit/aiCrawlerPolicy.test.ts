@@ -241,6 +241,27 @@ describe("parseAipref", () => {
     expect(result.state).toBe("measured");
   });
 
+  // Order must not decide the verdict: last-write-wins silently reported
+  // whichever line came last, so reversing the file flipped the answer.
+  it("reports contradictory values as a conflict, in either order", () => {
+    const yesThenNo = parseAipref(
+      "Content-Usage: train-ai=y\nContent-Usage: train-ai=n",
+    );
+    expect(yesThenNo.preferences["train-ai"]).toBe("conflict");
+
+    const noThenYes = parseAipref(
+      "Content-Usage: train-ai=n\nContent-Usage: train-ai=y",
+    );
+    expect(noThenYes.preferences["train-ai"]).toBe("conflict");
+  });
+
+  it("keeps a repeated identical value as that value", () => {
+    const result = parseAipref(
+      "Content-Usage: train-ai=n\nContent-Usage: train-ai=n",
+    );
+    expect(result.preferences["train-ai"]).toBe("disallowed");
+  });
+
   it("strips a leading path prefix and parses multiple keys", () => {
     const result = parseAipref("Content-Usage: / train-ai=y, search=n");
     expect(result.preferences["train-ai"]).toBe("allowed");

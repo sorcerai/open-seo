@@ -237,9 +237,14 @@ async function probeUrl(
 export async function liveCheckAiCrawlers(
   pageUrl: string,
 ): Promise<LiveCheckResult> {
+  // Validate the initial target here, not only the redirect hops below. Callers
+  // may pass an unvalidated URL, and this function issues real outbound
+  // requests, so the SSRF guard belongs at this boundary too.
+  const target = await normalizeAndValidateStartUrl(pageUrl);
+
   // 1. Baseline fetch with a normal browser UA.
   const baseline = await probeUrl(
-    pageUrl,
+    target,
     "baseline",
     BASELINE_USER_AGENT,
     "baseline",
@@ -253,7 +258,7 @@ export async function liveCheckAiCrawlers(
   const botResults = await Promise.all(
     botEntries.map(([bot, ua]) => {
       const entry = AI_BOT_TAXONOMY[bot];
-      return probeUrl(pageUrl, bot, ua, entry.purpose, entry.vendor);
+      return probeUrl(target, bot, ua, entry.purpose, entry.vendor);
     }),
   );
 
@@ -291,12 +296,19 @@ export async function liveCheckAiCrawlers(
     .filter((r) => r.contentMismatch)
     .map((r) => r.botName);
 
+  // Errored probes are neither blocked nor passing. Omitting them let a summary
+  // claim every probe got a 2xx while one never completed.
+  const errored = botResults
+    .filter((r) => r.error && !r.blocked)
+    .map((r) => r.botName);
+
   const parts: string[] = [];
   if (blocked.length) parts.push(`Blocked: ${blocked.join(", ")}`);
   if (challenged.length)
     parts.push(`Challenge pages: ${challenged.join(", ")}`);
   if (mismatched.length)
     parts.push(`Content mismatch: ${mismatched.join(", ")}`);
+  if (errored.length) parts.push(`Probe errors: ${errored.join(", ")}`);
   if (parts.length === 0)
     parts.push("All crawler-UA probes received 2xx responses");
 

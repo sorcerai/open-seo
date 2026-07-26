@@ -151,10 +151,12 @@ function purposeState(
 }
 
 function aiprefToState(
-  value: "allowed" | "disallowed" | "unknown" | undefined,
+  value: "allowed" | "disallowed" | "unknown" | "conflict" | undefined,
 ): "allowed" | "blocked" | "unknown" {
   if (value === "allowed") return "allowed";
   if (value === "disallowed") return "blocked";
+  // "conflict" included: contradictory directives mean we cannot tell, which is
+  // not the same as permission. Never resolve an unknown into "allowed".
   return "unknown";
 }
 
