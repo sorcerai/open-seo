@@ -35,8 +35,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          mkdir -p tmp
-          report="tmp/demand-pulse-ci-report.txt"
+          report="docs/demand-pulse/canaries/onfarmcompost-ci-report.txt"
           : > "$report"
 
           run_gate() {
@@ -63,6 +62,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tmp/demand-pulse-ci-report.txt
+          git add docs/demand-pulse/canaries/onfarmcompost-ci-report.txt
           git commit -m "chore(ci): capture Demand Pulse gate diagnostics [skip diagnose-once]"
           git push origin HEAD:feat/official-source-monitor
