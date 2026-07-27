@@ -1,0 +1,424 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sorcerai.dev/schemas/owned-attention/outcome-envelope.v1.schema.json",
+  "title": "OutcomeEnvelope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "outcomeId",
+    "actionEventId",
+    "projectId",
+    "recordedAt",
+    "measurementWindow",
+    "assets",
+    "distribution",
+    "metrics",
+    "revenue",
+    "cost",
+    "quality",
+    "attribution",
+    "governance"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "owned-attention.outcome.v1"
+    },
+    "outcomeId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "actionEventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "measurementWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end", "label"],
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "label": {
+          "type": "string",
+          "enum": ["launch", "7d", "30d", "90d", "365d", "custom"]
+        }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assetId",
+          "assetType",
+          "operation",
+          "canonicalUrl",
+          "repository",
+          "commit",
+          "publishedAt"
+        ],
+        "properties": {
+          "assetId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "assetType": {
+            "type": "string",
+            "enum": [
+              "page",
+              "tool",
+              "data_asset",
+              "video",
+              "image",
+              "email",
+              "social_post",
+              "offer",
+              "support_asset",
+              "sales_asset",
+              "other"
+            ]
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "created",
+              "updated",
+              "merged",
+              "redirected",
+              "retired",
+              "distributed"
+            ]
+          },
+          "canonicalUrl": {
+            "type": ["string", "null"],
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "repository": {
+            "type": ["string", "null"],
+            "maxLength": 256
+          },
+          "commit": {
+            "type": ["string", "null"],
+            "pattern": "^[0-9a-f]{7,40}$"
+          },
+          "publishedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "distribution": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "channel",
+          "source",
+          "campaignId",
+          "assetId",
+          "startedAt",
+          "endedAt",
+          "spend"
+        ],
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "organic_search",
+              "direct",
+              "email",
+              "referral",
+              "youtube",
+              "tiktok",
+              "instagram",
+              "pinterest",
+              "linkedin",
+              "facebook",
+              "reddit",
+              "partner",
+              "paid_search",
+              "paid_social",
+              "native",
+              "push",
+              "other"
+            ]
+          },
+          "source": {
+            "type": ["string", "null"],
+            "maxLength": 256
+          },
+          "campaignId": {
+            "type": ["string", "null"],
+            "maxLength": 256
+          },
+          "assetId": {
+            "type": ["string", "null"],
+            "maxLength": 256
+          },
+          "startedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "endedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "spend": {
+            "type": ["number", "null"],
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sessions",
+        "engagedSessions",
+        "pageviews",
+        "returnVisits",
+        "conversions",
+        "qualifiedLeads",
+        "citations",
+        "aiMentions",
+        "corrections"
+      ],
+      "properties": {
+        "sessions": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "engagedSessions": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "pageviews": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "returnVisits": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "conversions": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "qualifiedLeads": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "citations": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "aiMentions": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "corrections": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        }
+      }
+    },
+    "revenue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "display",
+        "affiliate",
+        "lead",
+        "product",
+        "sponsorship",
+        "other",
+        "currency"
+      ],
+      "properties": {
+        "display": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "affiliate": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "lead": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "product": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "sponsorship": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "other": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "research",
+        "production",
+        "distribution",
+        "media",
+        "maintenance",
+        "other",
+        "currency"
+      ],
+      "properties": {
+        "research": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "production": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "distribution": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "media": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "maintenance": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "other": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policyIncidents",
+        "sourceConflicts",
+        "staleDataIncidents",
+        "unsupportedClaimIncidents",
+        "notes"
+      ],
+      "properties": {
+        "policyIncidents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sourceConflicts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "staleDataIncidents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unsupportedClaimIncidents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notes": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      }
+    },
+    "attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["confidence", "method", "limitations"],
+      "properties": {
+        "confidence": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "unknown"]
+        },
+        "method": {
+          "type": ["string", "null"],
+          "maxLength": 2000
+        },
+        "limitations": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "appendOnly",
+        "historicalEvidenceMutated",
+        "reviewedBy",
+        "reviewedAt"
+      ],
+      "properties": {
+        "appendOnly": {
+          "const": true
+        },
+        "historicalEvidenceMutated": {
+          "const": false
+        },
+        "reviewedBy": {
+          "type": ["string", "null"],
+          "maxLength": 256
+        },
+        "reviewedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

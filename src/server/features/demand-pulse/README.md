@@ -1,59 +1,69 @@
 # Demand Pulse
 
-This folder is an additive, feature-flagged foundation for OpenSEO Demand Pulse.
+Demand Pulse is OpenSEO's feature-flagged demand-sensing and action-review subsystem.
 
-Phase 0 introduced contracts and source adapters without registering routes, mutating the production schema, or adding navigation. The first executable canary slice now adds a disabled-by-default OnFarmCompost official-page monitor. It uses the existing Worker cron and R2 binding, but it does not register UI routes, migrate D1, cluster evidence, score recommendations, update GitHub, or publish content.
+It collects bounded, source-labeled evidence, preserves source health and provenance, resolves duplicates and independent evidence events, maps observations into durable problem families, compares those families with current site coverage, scores the result, and exposes a maximum of five candidate actions for human review.
 
-## Included contracts
+It does **not** publish content.
 
-- Canonical demand observation, prompt-family, action, and scoring types.
-- Deterministic scoring with versioned weights and explicit penalties.
-- URL/text normalization, duplicate detection, and cross-post preservation.
-- Source-adapter interface with bounded concurrency.
-- Working Hacker News source adapter using the public Firebase API.
-- First-party import normalizer.
-- DataForSEO `discussions_and_forums` normalizer that reuses OpenSEO's existing transport, billing, and cache layer instead of inventing a second one.
-- Retention profiles, including a strict Reddit override.
-- Zod MCP input contracts and tests.
+## Current implementation state
 
-## OnFarmCompost official-page monitor
+Baseline: OpenSEO `main` after PR #6 (`941c615808c3b4c61aa4955b3bf4b9199b5237f7`).
 
-The canary is split by responsibility:
+Implemented:
 
-- `canaries/onfarmcompost-official-sources.ts` owns the source registry, explicit redirect-host allowlists, bounded fetching, primary-content extraction, and fingerprints.
-- `canaries/onfarmcompost-official-store.ts` owns validated state parsing and JSON artifact writes through a narrow R2 interface.
-- `canaries/onfarmcompost-official-monitor.ts` owns the Chicago-time gate, source-health threshold, change observations, artifact assembly, and daily orchestration.
+- SQLite and Postgres-compatible normalized schemas and migrations.
+- Project-scoped profiles, approved sources, daily runs, source runs, observations, evidence events, duplicate edges, families, coverage checks, scores, feed items, and review decisions.
+- Disabled-by-default source adapters and acquisition boundaries for approved official pages, GSC, DataForSEO discussions/forums, first-party imports, Hacker News, and local-news discovery.
+- The OnFarmCompost official-source monitor and scheduled daily canary orchestrator.
+- Source-health thresholds, daily idempotency, bounded artifacts, cost recording, and failure preservation.
+- Deduplication, independent-evidence preservation, family mapping, coverage evaluation, deterministic scoring, and bounded feed selection.
+- A hidden project route for the latest review feed and item detail.
+- Human decisions: accept, reject, defer, or request more research. A decision never triggers publication.
+- Read-only MCP tools:
+  - `get_demand_pulse_feed`
+  - `get_demand_pulse_feed_item`
 
-When every required flag is enabled, the existing 15-minute Worker cron checks once per America/Chicago calendar day after 05:00 local time. It fetches a bounded set of official pages from TCEQ, the Texas Attorney General, the City of Houston, EPA, USDA NRCS Texas, and Texas A&M AgriLife Extension.
+Still canary-specific:
 
-Controls:
+- Scheduled execution is gated by `DEMAND_PULSE_CANARY_ONFARMCOMPOST`.
+- The project ID is supplied through `DEMAND_PULSE_ONFARMCOMPOST_PROJECT_ID`.
+- The seven-run usefulness gate has not yet promoted Demand Pulse into a generalized multi-project product.
+- No GitHub, PageSpace, publishing, monetization, or distribution sink is wired.
 
-- Disabled by default.
-- Refuses to run unless dry-run is true and write-enabled is false.
-- Uses `Intl.DateTimeFormat` with `America/Chicago`, so daylight-saving changes do not require a UTC cron rewrite.
-- Uses the daily R2 artifact key as an idempotency gate.
-- Retries on a later cron when fewer than three official sources are healthy.
-- Limits each response to 1.5 MB and each request to 15 seconds.
-- Accepts redirects only to each source's explicit official-host allowlist.
-- Fingerprints the first `main`, `article`, or `[role='main']` region when present, reducing false changes from global navigation and footers.
-- Removes scripts, styles, templates, SVG, and other executable or decorative markup.
-- Stores fingerprints, bounded excerpts, headers, source health, and provenance.
-- Does not retain full page HTML or normalized full text.
-- Emits observations only when the normalized primary-content fingerprint changes.
-- Writes the evidence artifact before advancing source fingerprints. A failed state write can cause a later duplicate observation, but it cannot erase the collected change.
-- Emits no candidate cards and exposes `coverage_clustering_scoring_and_review_not_wired` in every artifact.
-- Never publishes or changes the OnFarmCompost site.
+## Safety invariants
 
-R2 keys:
+1. Feature and source flags default off.
+2. Dry-run defaults on.
+3. The scheduled canary refuses to run when dry-run is disabled or write mode is enabled.
+4. Reddit remains disabled until its terms, commercial-use, retention, and deletion profile is approved.
+5. Failed, blocked, skipped, or uncertain acquisition remains explicit. It never becomes zero or a clean pass.
+6. Duplicate copies do not inflate independent corroboration.
+7. Every feed item keeps exact run, evidence, score, selection, coverage, and provenance lineage.
+8. No run emits more than five feed items.
+9. A human decision records intent only. `publicationTriggered` remains false.
+10. OpenSEO does not create or mutate downstream content.
+
+## Daily canary flow
 
 ```text
-demand-pulse/onfarmcompost/state/official-pages.json
-demand-pulse/onfarmcompost/runs/YYYY-MM-DD.json
+registered profile
+  -> safety and budget gates
+  -> independently acquire approved sources
+  -> persist source health and normalized observations
+  -> resolve duplicates and independent evidence events
+  -> map observations into configured problem families
+  -> compare each family with current coverage
+  -> score with explicit positive components and penalties
+  -> persist at most five feed items
+  -> write one bounded versioned R2 artifact
+  -> expose the same records through UI and read-only MCP
+  -> record a human review decision
 ```
 
-## Required flags for the canary
+## Feature flags
 
-All defaults remain safe and off:
+All defaults remain safe:
 
 ```env
 DEMAND_PULSE_ENABLED=false
@@ -67,29 +77,71 @@ DEMAND_PULSE_SOURCE_REDDIT=false
 DEMAND_PULSE_CANARY_ONFARMCOMPOST=false
 ```
 
-To enable only the official-page dry run, set:
+The OnFarmCompost scheduled canary also requires:
 
 ```env
-DEMAND_PULSE_ENABLED=true
-DEMAND_PULSE_DRY_RUN=true
-DEMAND_PULSE_WRITE_ENABLED=false
-DEMAND_PULSE_SOURCE_OFFICIAL_PAGES=true
-DEMAND_PULSE_CANARY_ONFARMCOMPOST=true
+DEMAND_PULSE_ONFARMCOMPOST_PROJECT_ID=<registered-project-uuid>
 ```
 
-Do not enable Reddit as part of this change.
+Do not enable Reddit as part of the canary.
 
-## Remaining integration
+## Owned Attention handoff
 
-1. Add D1/Drizzle tables from `docs/demand-pulse/REFERENCE_SCHEMA.sql` using the next repository migration number.
-2. Implement repositories and services around the current OpenSEO database layer.
-3. Connect GSC and DataForSEO transport to the canary seed families.
-4. Add official-page observations to deduplication, clustering, coverage analysis, and scoring.
-5. Persist versioned evidence and recommendation entities, not only daily R2 artifacts.
-6. Register read-only MCP tools first.
-7. Add per-project locks and source budgets for paid acquisition.
-8. Add a hidden route and enable it only for the canary project.
-9. Update one weekly OnFarmCompost review issue from accepted run artifacts.
-10. Keep all write, promote, dismiss, and publish actions behind explicit confirmation.
+Demand Pulse is the sensing layer of the broader Owned Attention system:
 
-The official monitor is an acquisition slice, not the completed Demand Pulse product. A daily JSON object is evidence that collection ran. It is not evidence that a recommendation is useful.
+```text
+OpenSEO Demand Pulse
+  -> Constellation decision and coverage intelligence
+  -> approved content or product brief
+  -> project repository implementation
+  -> MotionPress and other owned distribution
+  -> monetization routing
+  -> traffic, revenue, citation, lead, and quality outcomes
+  -> OpenSEO and Constellation learning loop
+```
+
+Canonical design material:
+
+- [`docs/owned-attention/README.md`](../../../../docs/owned-attention/README.md)
+- [`docs/owned-attention/DEMAND_ACTION_ENVELOPE_V1.md`](../../../../docs/owned-attention/DEMAND_ACTION_ENVELOPE_V1.md)
+- [`docs/owned-attention/demand-action-envelope.v1.schema.json`](../../../../docs/owned-attention/demand-action-envelope.v1.schema.json)
+- [`docs/owned-attention/outcome-envelope.v1.schema.json`](../../../../docs/owned-attention/outcome-envelope.v1.schema.json)
+- [`docs/owned-attention/AGENT_HANDOFF.md`](../../../../docs/owned-attention/AGENT_HANDOFF.md)
+
+These contracts are design targets. The exporter, Constellation importer, downstream production sink, and outcome ingestion are not yet wired.
+
+## Next implementation gate
+
+Do not generalize the product because the code exists. Generalize only after the OnFarmCompost canary proves that the review feed is useful.
+
+Required next sequence:
+
+1. Complete seven consecutive scheduled dry runs.
+2. Review false positives, missed demand, source health, cost, accepted actions, and rejected noise.
+3. Freeze the first `DemandActionEnvelope` mapping from an accepted feed item.
+4. Add a read-only export service and MCP surface.
+5. Add a Constellation importer that preserves the original lineage rather than re-scoring anonymous prose.
+6. Add outcome ingestion after one approved action is implemented and measured.
+7. Only then generalize project onboarding and optional review sinks.
+
+## Verification
+
+For code changes:
+
+```bash
+pnpm ci:check
+pnpm test:ci
+pnpm build
+```
+
+Also smoke-test:
+
+- authorized project feed access;
+- unauthorized project rejection;
+- exact feed-item lineage lookup;
+- review decision recording with `publicationTriggered=false`;
+- scheduled canary fail-closed behavior;
+- bounded feed size;
+- artifact and database lineage parity.
+
+A daily JSON artifact proves collection ran. It does not prove that a recommendation is useful or that a new page deserves to exist.
