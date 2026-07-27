@@ -116,9 +116,9 @@ describe("OnFarmCompost official-source schedule", () => {
     expect(
       isPastDailyRunTime({ date: "2026-07-26", hour: 4, minute: 59 }),
     ).toBe(false);
-    expect(
-      isPastDailyRunTime({ date: "2026-07-26", hour: 5, minute: 0 }),
-    ).toBe(true);
+    expect(isPastDailyRunTime({ date: "2026-07-26", hour: 5, minute: 0 })).toBe(
+      true,
+    );
     expect(
       isPastDailyRunTime({ date: "2026-07-26", hour: 17, minute: 30 }),
     ).toBe(true);

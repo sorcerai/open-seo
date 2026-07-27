@@ -346,7 +346,8 @@ export async function fetchOfficialPageSnapshot(
       throw new Error(`Redirected outside allowed official host: ${finalUrl}`);
     }
 
-    const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+    const contentType =
+      response.headers.get("content-type")?.toLowerCase() ?? "";
     if (
       contentType &&
       !contentType.includes("text/html") &&
@@ -380,7 +381,10 @@ export async function fetchOfficialPageSnapshot(
   }
 }
 
-async function readJsonObject<T>(bucket: R2Bucket, key: string): Promise<T | null> {
+async function readJsonObject<T>(
+  bucket: R2Bucket,
+  key: string,
+): Promise<T | null> {
   const object = await bucket.get(key);
   if (!object) return null;
   return object.json<T>();
@@ -466,7 +470,10 @@ export async function runScheduledOnFarmCompostOfficialMonitor(
   }
 
   const generatedAt = now.toISOString();
-  const previousState = await readJsonObject<OfficialPageState>(env.R2, STATE_KEY);
+  const previousState = await readJsonObject<OfficialPageState>(
+    env.R2,
+    STATE_KEY,
+  );
   const nextSources: Record<string, OfficialPageStateEntry> = {
     ...(previousState?.sources ?? {}),
   };
@@ -516,7 +523,9 @@ export async function runScheduledOnFarmCompostOfficialMonitor(
   );
 
   const successful = results.filter(
-    (result): result is (typeof results)[number] & {
+    (
+      result,
+    ): result is (typeof results)[number] & {
       snapshot: OfficialPageSnapshot;
       error: null;
     } => result.snapshot !== null,
