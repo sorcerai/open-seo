@@ -7,6 +7,7 @@ import { resolveUserContextFromHeaders } from "@/middleware/ensure-user/resolve"
 import { ProjectRepository } from "@/server/features/projects/repositories/ProjectRepository";
 import { SamSessionRepository } from "@/server/features/sam/SamSessionRepository";
 import { runScheduledRankChecks } from "@/server/features/rank-tracking/services/scheduledRankChecks";
+import { runScheduledOnFarmCompostOfficialMonitor } from "@/server/features/demand-pulse/canaries/onfarmcompost-official-monitor";
 import { getOrCreateOrganizationCustomer } from "@/server/billing/subscription";
 import { isHostedServerAuthMode } from "@/server/lib/runtime-env";
 import { getAuthMode, isHostedAuthMode } from "@/lib/auth-mode";
@@ -185,7 +186,20 @@ export default {
     env: Env,
     _ctx: ExecutionContext,
   ) {
-    // Scope a per-request Postgres client for the cron run (no-op in D1 mode).
-    await withPgClient(() => runScheduledRankChecks(env));
+    // Preserve the existing rank-tracking failure signal, but always give the
+    // disabled-by-default Demand Pulse canary its independent execution chance.
+    try {
+      // Scope a per-request Postgres client for the rank cron (no-op in D1 mode).
+      await withPgClient(() => runScheduledRankChecks(env));
+    } finally {
+      try {
+        await runScheduledOnFarmCompostOfficialMonitor(env);
+      } catch (error) {
+        console.error(
+          "[demand-pulse] OnFarmCompost official monitor failed:",
+          error,
+        );
+      }
+    }
   },
 };
