@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "0.1-draft",
+  "artifactType": "documentation_bridge_manifest",
+  "runtimeConsumed": false,
+  "canary": {
+    "id": "onfarmcompost",
+    "name": "OnFarmCompost",
+    "siteUrl": "https://www.onfarmcompost.com",
+    "timezone": "America/Chicago",
+    "mode": "dry_run",
+    "autoPublish": false,
+    "primaryOwner": "Aria",
+    "operatorReviewer": "Scotty"
+  },
+  "canonicalContract": {
+    "repository": "sorcerai/onfarmcompost",
+    "commit": "4d436f12ab2853410e1f4930f4cb0ee3b82cad93",
+    "policyPath": "docs/CONTENT_INTELLIGENCE_OS.md",
+    "seedPath": "ops/content-intelligence/onfarmcompost-canary.seed.json",
+    "trackingIssue": "https://github.com/sorcerai/onfarmcompost/issues/10",
+    "claimGateIssue": "https://github.com/sorcerai/onfarmcompost/issues/14"
+  },
+  "openSeoBaseline": {
+    "repository": "sorcerai/open-seo",
+    "phase0Commit": "0c73c5fa3934482a8cd6386ae476f43cdee31413",
+    "currentBaseCommit": "d24bf0766e6c45be597080df6ba4cde9d211733d",
+    "phase0State": "contracts_present_not_wired",
+    "featureDefault": "disabled",
+    "sourceDefault": "disabled",
+    "dryRunDefault": true
+  },
+  "schedule": {
+    "cron": "0 5 * * *",
+    "timezone": "America/Chicago",
+    "comparisonWindowsDays": [1, 7, 30, 90, 365],
+    "humanReview": "weekly",
+    "publication": "manual_only"
+  },
+  "budget": {
+    "currency": "USD",
+    "dataForSeoDailyCeiling": 1,
+    "stopNonessentialAcquisitionAtCeiling": true,
+    "cacheUnchangedOfficialSources": true
+  },
+  "enabledSourceFamilies": [
+    "google_search_console",
+    "dataforseo_serp",
+    "dataforseo_related_queries",
+    "dataforseo_people_also_ask",
+    "dataforseo_trends",
+    "dataforseo_discussions_and_forums",
+    "manual_first_party_import",
+    "official_page_monitoring",
+    "local_news_and_trade_discovery"
+  ],
+  "disabledSourceFamilies": [
+    {
+      "id": "reddit",
+      "reason": "Commercial-use, retention, deletion-propagation, privacy, and source-policy gates are not approved."
+    },
+    {
+      "id": "youtube_comments",
+      "reason": "Quota, deletion behavior, and source policy are not implemented."
+    },
+    {
+      "id": "restricted_social_scraping",
+      "reason": "Private or restricted Facebook, LinkedIn, Instagram, Threads, TikTok, X, and Quora scraping is out of scope."
+    }
+  ],
+  "processing": {
+    "preserveProvenance": true,
+    "preserveSourceClass": true,
+    "deduplicateSyndication": true,
+    "deduplicateCrossPosts": true,
+    "clusterDurableProblemFamilies": true,
+    "compareExistingCoverage": true,
+    "preferExistingPageUpdate": true,
+    "includeNonContentActions": true,
+    "failClosedOnSourceUncertainty": true
+  },
+  "output": {
+    "maxCandidateCardsPerRun": 5,
+    "versionedEvidenceArtifact": true,
+    "weeklyReviewIssue": true,
+    "oneIssuePerObservation": false,
+    "pageSpaceMirrorWhenAvailable": true,
+    "requiredCardFields": [
+      "familyId",
+      "title",
+      "whyNow",
+      "observedLanguage",
+      "evidence",
+      "scoreVector",
+      "penalties",
+      "existingCoverage",
+      "recommendedAction",
+      "riskFlags",
+      "owner",
+      "reviewBy"
+    ]
+  },
+  "allowedActions": [
+    "update_existing_page",
+    "add_faq",
+    "create_data_note",
+    "create_resource_page",
+    "create_tool",
+    "create_template",
+    "create_directory_entry",
+    "create_case_study",
+    "create_outreach_task",
+    "change_offer_or_workflow",
+    "monitor",
+    "reject"
+  ],
+  "sevenRunAcceptanceGate": [
+    "Seven consecutive scheduled dry runs complete.",
+    "Zero content is auto-published.",
+    "No run returns more than five candidate cards.",
+    "Every card preserves provenance and includes an existing-page coverage check.",
+    "Syndicated or cross-posted evidence does not inflate independent corroboration.",
+    "A failed or uncertain source cannot silently become a positive signal.",
+    "At least one accepted action updates an existing page.",
+    "At least one accepted action is non-content.",
+    "Cost per accepted action is reported.",
+    "Accepted actions can be traced to later authority, search, lead, correction, or revenue outcomes."
+  ],
+  "implementationState": {
+    "bridgeManifestCreated": true,
+    "canonicalSiteContractMerged": true,
+    "runtimeRegistration": false,
+    "schedulerWired": false,
+    "projectSourceRegistryWired": false,
+    "dailyArtifactSinkWired": false,
+    "weeklyReviewSinkWired": false,
+    "pageSpaceSinkWired": false,
+    "firstRunCompleted": false
+  }
+}
