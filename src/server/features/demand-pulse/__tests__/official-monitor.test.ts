@@ -1,70 +1,87 @@
+import { z } from "zod";
 import { describe, expect, it, vi } from "vitest";
-import { getDemandPulseFeatureFlags } from "../feature-flags";
 import {
   extractOfficialPageText,
-  getChicagoDateTime,
   isAllowedOfficialRedirect,
+  type OfficialPageFetch,
+} from "../canaries/onfarmcompost-official-sources";
+import {
+  getChicagoDateTime,
   isPastDailyRunTime,
   runScheduledOnFarmCompostOfficialMonitor,
+  type OnFarmCompostOfficialMonitorEnv,
 } from "../canaries/onfarmcompost-official-monitor";
+import type {
+  DemandPulseJsonBody,
+  DemandPulseJsonBucket,
+} from "../canaries/onfarmcompost-official-store";
+import { getDemandPulseFeatureFlags } from "../feature-flags";
 
-class MemoryR2 {
+class MemoryR2 implements DemandPulseJsonBucket {
   readonly objects = new Map<string, string>();
+  readonly putOrder: string[] = [];
 
-  async head(key: string) {
-    return this.objects.has(key) ? ({ key } as R2Object) : null;
+  async head(key: string): Promise<unknown | null> {
+    return this.objects.has(key) ? { key } : null;
   }
 
-  async get(key: string) {
+  async get(key: string): Promise<DemandPulseJsonBody | null> {
     const value = this.objects.get(key);
     if (value === undefined) return null;
     return {
-      key,
-      async json<T>() {
-        return JSON.parse(value) as T;
-      },
-    } as R2ObjectBody;
+      text: async () => value,
+    };
   }
 
-  async put(key: string, value: unknown) {
-    if (typeof value !== "string") {
-      throw new Error("MemoryR2 test double only accepts string values");
-    }
+  async put(key: string, value: string): Promise<unknown> {
     this.objects.set(key, value);
-    return { key } as R2Object;
+    this.putOrder.push(key);
+    return { key };
   }
 }
 
-function enabledEnv(bucket: MemoryR2): Env {
+function enabledEnv(
+  bucket: DemandPulseJsonBucket,
+): OnFarmCompostOfficialMonitorEnv {
   return {
-    R2: bucket as unknown as R2Bucket,
+    R2: bucket,
     DEMAND_PULSE_ENABLED: "true",
     DEMAND_PULSE_WRITE_ENABLED: "false",
     DEMAND_PULSE_DRY_RUN: "true",
     DEMAND_PULSE_SOURCE_OFFICIAL_PAGES: "true",
     DEMAND_PULSE_CANARY_ONFARMCOMPOST: "true",
-  } as unknown as Env;
+  };
 }
 
-function healthyOfficialFetch(): typeof fetch {
+function healthyOfficialFetch() {
   const body = `<html><head><title>Official compost guidance</title></head><body>
+    <nav>Frequently changing navigation</nav>
     <main>${"Verified public composting guidance and program information. ".repeat(20)}</main>
     <script>window.secret = "do not retain";</script>
   </body></html>`;
+  const implementation: OfficialPageFetch = async () =>
+    new Response(body, {
+      status: 200,
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "last-modified": "Sun, 26 Jul 2026 12:00:00 GMT",
+        etag: '"official-v1"',
+      },
+    });
 
-  return vi.fn(async () =>
-    Promise.resolve(
-      new Response(body, {
-        status: 200,
-        headers: {
-          "content-type": "text/html; charset=utf-8",
-          "last-modified": "Sun, 26 Jul 2026 12:00:00 GMT",
-          etag: '"official-v1"',
-        },
-      }),
-    ),
-  ) as unknown as typeof fetch;
+  return vi.fn(implementation);
 }
+
+const artifactTestSchema = z.object({
+  publicationAllowed: z.literal(false),
+  observations: z.array(z.object({ excerpt: z.string() })),
+  candidateCards: z.array(z.unknown()),
+  summary: z.object({
+    successfulSources: z.number(),
+    changedSources: z.number(),
+  }),
+  nextStage: z.literal("coverage_clustering_scoring_and_review_not_wired"),
+});
 
 describe("Demand Pulse feature flags", () => {
   it("keeps the canary and every source disabled by default", () => {
@@ -126,43 +143,52 @@ describe("OnFarmCompost official-source schedule", () => {
 });
 
 describe("official page safety helpers", () => {
-  it("removes executable and decorative content before fingerprinting", () => {
+  it("fingerprints primary content without scripts, styles, or navigation", () => {
     const extracted = extractOfficialPageText(`
       <html>
         <head><title> Compost Rules </title><style>.hidden{}</style></head>
-        <body><main>Texas compost guidance</main><script>steal()</script></body>
+        <body>
+          <nav>Changing navigation</nav>
+          <main>Texas compost guidance</main>
+          <script>steal()</script>
+        </body>
       </html>
     `);
 
     expect(extracted.title).toBe("Compost Rules");
     expect(extracted.text).toBe("Texas compost guidance");
     expect(extracted.excerpt).not.toContain("steal");
+    expect(extracted.excerpt).not.toContain("Changing navigation");
   });
 
-  it("allows same-host and parent-host redirects but blocks unrelated hosts", () => {
+  it("allows only the requested or explicitly approved official hosts", () => {
+    const allowedHosts = ["www.tceq.texas.gov", "tceq.texas.gov"];
     expect(
       isAllowedOfficialRedirect(
         "https://www.tceq.texas.gov/source",
         "https://www.tceq.texas.gov/final",
+        allowedHosts,
       ),
     ).toBe(true);
     expect(
       isAllowedOfficialRedirect(
         "https://www.tceq.texas.gov/source",
         "https://tceq.texas.gov/final",
+        allowedHosts,
       ),
     ).toBe(true);
     expect(
       isAllowedOfficialRedirect(
         "https://www.tceq.texas.gov/source",
-        "https://example.com/final",
+        "https://texas.gov/final",
+        allowedHosts,
       ),
     ).toBe(false);
   });
 });
 
 describe("runScheduledOnFarmCompostOfficialMonitor", () => {
-  it("writes one bounded dry-run artifact and state after the daily gate", async () => {
+  it("writes the evidence artifact before advancing source state", async () => {
     const bucket = new MemoryR2();
     const fetchFn = healthyOfficialFetch();
     const result = await runScheduledOnFarmCompostOfficialMonitor(
@@ -178,33 +204,29 @@ describe("runScheduledOnFarmCompostOfficialMonitor", () => {
     });
     expect(fetchFn).toHaveBeenCalledTimes(6);
 
-    const artifactText = bucket.objects.get(
-      "demand-pulse/onfarmcompost/runs/2026-07-26.json",
-    );
+    const artifactKey =
+      "demand-pulse/onfarmcompost/runs/2026-07-26.json";
+    const stateKey =
+      "demand-pulse/onfarmcompost/state/official-pages.json";
+    expect(bucket.putOrder).toEqual([artifactKey, stateKey]);
+
+    const artifactText = bucket.objects.get(artifactKey);
     expect(artifactText).toBeDefined();
-    const artifact = JSON.parse(artifactText ?? "{}") as {
-      publicationAllowed: boolean;
-      observations: Array<{ excerpt: string }>;
-      candidateCards: unknown[];
-      summary: { successfulSources: number; changedSources: number };
-      nextStage: string;
-    };
+    const parsed: unknown = JSON.parse(artifactText ?? "{}");
+    const artifact = artifactTestSchema.parse(parsed);
 
     expect(artifact.publicationAllowed).toBe(false);
     expect(artifact.candidateCards).toEqual([]);
-    expect(artifact.summary).toEqual(
-      expect.objectContaining({ successfulSources: 6, changedSources: 6 }),
-    );
+    expect(artifact.summary).toEqual({
+      successfulSources: 6,
+      changedSources: 6,
+    });
     expect(artifact.observations).toHaveLength(6);
     expect(artifact.observations[0]?.excerpt).not.toContain("do not retain");
     expect(artifact.nextStage).toBe(
       "coverage_clustering_scoring_and_review_not_wired",
     );
-    expect(
-      bucket.objects.has(
-        "demand-pulse/onfarmcompost/state/official-pages.json",
-      ),
-    ).toBe(true);
+    expect(bucket.objects.has(stateKey)).toBe(true);
   });
 
   it("does not run twice for the same Chicago calendar date", async () => {
@@ -230,12 +252,12 @@ describe("runScheduledOnFarmCompostOfficialMonitor", () => {
     expect(fetchFn).toHaveBeenCalledTimes(6);
   });
 
-  it("fails closed when write mode or non-dry-run mode is enabled", async () => {
+  it("fails closed when write mode is enabled", async () => {
     const bucket = new MemoryR2();
-    const env = {
+    const env: OnFarmCompostOfficialMonitorEnv = {
       ...enabledEnv(bucket),
       DEMAND_PULSE_WRITE_ENABLED: "true",
-    } as unknown as Env;
+    };
 
     const result = await runScheduledOnFarmCompostOfficialMonitor(
       env,
