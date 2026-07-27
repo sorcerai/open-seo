@@ -18,9 +18,11 @@ Phase 0 introduced contracts and source adapters without registering routes, mut
 
 ## OnFarmCompost official-page monitor
 
-The monitor is implemented in:
+The canary is split by responsibility:
 
-`canaries/onfarmcompost-official-monitor.ts`
+- `canaries/onfarmcompost-official-sources.ts` owns the source registry, explicit redirect-host allowlists, bounded fetching, primary-content extraction, and fingerprints.
+- `canaries/onfarmcompost-official-store.ts` owns validated state parsing and JSON artifact writes through a narrow R2 interface.
+- `canaries/onfarmcompost-official-monitor.ts` owns the Chicago-time gate, source-health threshold, change observations, artifact assembly, and daily orchestration.
 
 When every required flag is enabled, the existing 15-minute Worker cron checks once per America/Chicago calendar day after 05:00 local time. It fetches a bounded set of official pages from TCEQ, the Texas Attorney General, the City of Houston, EPA, USDA NRCS Texas, and Texas A&M AgriLife Extension.
 
@@ -32,11 +34,13 @@ Controls:
 - Uses the daily R2 artifact key as an idempotency gate.
 - Retries on a later cron when fewer than three official sources are healthy.
 - Limits each response to 1.5 MB and each request to 15 seconds.
-- Rejects redirects outside the requested official host or its parent/subdomain relationship.
+- Accepts redirects only to each source's explicit official-host allowlist.
+- Fingerprints the first `main`, `article`, or `[role='main']` region when present, reducing false changes from global navigation and footers.
 - Removes scripts, styles, templates, SVG, and other executable or decorative markup.
 - Stores fingerprints, bounded excerpts, headers, source health, and provenance.
-- Does not retain full page HTML or text.
-- Emits observations only when the normalized page fingerprint changes.
+- Does not retain full page HTML or normalized full text.
+- Emits observations only when the normalized primary-content fingerprint changes.
+- Writes the evidence artifact before advancing source fingerprints. A failed state write can cause a later duplicate observation, but it cannot erase the collected change.
 - Emits no candidate cards and exposes `coverage_clustering_scoring_and_review_not_wired` in every artifact.
 - Never publishes or changes the OnFarmCompost site.
 
