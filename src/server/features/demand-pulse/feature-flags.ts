@@ -10,13 +10,25 @@ export interface DemandPulseFeatureFlags {
   canaryOnFarmCompost: boolean;
 }
 
+export interface DemandPulseFeatureFlagEnv {
+  DEMAND_PULSE_ENABLED?: string;
+  DEMAND_PULSE_WRITE_ENABLED?: string;
+  DEMAND_PULSE_DRY_RUN?: string;
+  DEMAND_PULSE_SOURCE_DATAFORSEO_DISCUSSIONS?: string;
+  DEMAND_PULSE_SOURCE_HACKER_NEWS?: string;
+  DEMAND_PULSE_SOURCE_FIRST_PARTY_IMPORT?: string;
+  DEMAND_PULSE_SOURCE_OFFICIAL_PAGES?: string;
+  DEMAND_PULSE_SOURCE_REDDIT?: string;
+  DEMAND_PULSE_CANARY_ONFARMCOMPOST?: string;
+}
+
 function envBoolean(value: string | undefined, fallback: boolean): boolean {
   if (value === undefined || value === "") return fallback;
   return ["1", "true", "yes", "on"].includes(value.toLowerCase());
 }
 
 export function getDemandPulseFeatureFlags(
-  env: Record<string, string | undefined>,
+  env: DemandPulseFeatureFlagEnv,
 ): DemandPulseFeatureFlags {
   return {
     enabled: envBoolean(env.DEMAND_PULSE_ENABLED, false),
