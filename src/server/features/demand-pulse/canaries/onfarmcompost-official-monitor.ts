@@ -29,8 +29,7 @@ const TIME_ZONE = "America/Chicago";
 const DAILY_RUN_HOUR = 5;
 const MINIMUM_SUCCESSFUL_SOURCES = 3;
 
-export interface OnFarmCompostOfficialMonitorEnv
-  extends DemandPulseFeatureFlagEnv {
+export interface OnFarmCompostOfficialMonitorEnv extends DemandPulseFeatureFlagEnv {
   R2: DemandPulseJsonBucket;
 }
 
@@ -232,15 +231,10 @@ export async function runScheduledOnFarmCompostOfficialMonitor(
     artifactType: artifact.artifactType,
     localDate: local.date,
   });
-  await writeJsonArtifact(
-    env.R2,
-    ONFARMCOMPOST_OFFICIAL_STATE_KEY,
-    nextState,
-    {
-      projectId: ONFARMCOMPOST_PROJECT_ID,
-      artifactType: "official-page-state",
-    },
-  );
+  await writeJsonArtifact(env.R2, ONFARMCOMPOST_OFFICIAL_STATE_KEY, nextState, {
+    projectId: ONFARMCOMPOST_PROJECT_ID,
+    artifactType: "official-page-state",
+  });
 
   console.log(
     `[demand-pulse] OnFarmCompost dry run wrote ${artifactKey}: ${artifact.summary.changedSources} changed, ${successful.length}/${results.length} healthy`,
