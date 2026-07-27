@@ -7,3 +7,4 @@ export * from "./sources/adapter";
 export * from "./sources/hacker-news";
 export * from "./sources/manual-first-party";
 export * from "./sources/dataforseo-discussions-normalizer";
+export * from "./canaries/onfarmcompost-official-monitor";
