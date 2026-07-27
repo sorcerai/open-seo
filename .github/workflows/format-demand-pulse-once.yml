@@ -64,3 +64,5 @@ jobs:
             src/server/features/demand-pulse/index.ts
           git commit -m "style(demand-pulse): format official monitor refactor [skip format-once]"
           git push origin HEAD:feat/official-source-monitor
+
+# Temporary branch-only workflow. Delete after its formatting commit lands.
