@@ -3,13 +3,16 @@ import {
   type DemandPulseFeatureFlagEnv,
 } from "../feature-flags";
 import { mapWithConcurrency } from "../sources/adapter";
-import type { DemandObservationCandidate } from "../types";
+import {
+  buildOnFarmCompostOfficialMonitorArtifact,
+  isSuccessfulOfficialSource,
+  type OfficialSourceResult,
+} from "./onfarmcompost-official-artifact";
 import {
   fetchOfficialPageSnapshot,
   ONFARMCOMPOST_OFFICIAL_PAGE_SEEDS,
   type OfficialPageFetch,
   type OfficialPageSeed,
-  type OfficialPageSnapshot,
 } from "./onfarmcompost-official-sources";
 import {
   ONFARMCOMPOST_ARTIFACT_PREFIX,
@@ -26,7 +29,8 @@ const TIME_ZONE = "America/Chicago";
 const DAILY_RUN_HOUR = 5;
 const MINIMUM_SUCCESSFUL_SOURCES = 3;
 
-export interface OnFarmCompostOfficialMonitorEnv extends DemandPulseFeatureFlagEnv {
+export interface OnFarmCompostOfficialMonitorEnv
+  extends DemandPulseFeatureFlagEnv {
   R2: DemandPulseJsonBucket;
 }
 
@@ -34,60 +38,6 @@ interface LocalDateTime {
   date: string;
   hour: number;
   minute: number;
-}
-
-interface SuccessfulSourceResult {
-  seed: OfficialPageSeed;
-  snapshot: OfficialPageSnapshot;
-  changed: boolean;
-  previousFingerprint: string | null;
-  error: null;
-}
-
-interface FailedSourceResult {
-  seed: OfficialPageSeed;
-  snapshot: null;
-  changed: false;
-  previousFingerprint: string | null;
-  error: string;
-}
-
-type SourceResult = SuccessfulSourceResult | FailedSourceResult;
-
-interface SourceHealthEntry {
-  sourceId: string;
-  requestedUrl: string;
-  ok: boolean;
-  changed: boolean;
-  httpStatus: number | null;
-  finalUrl: string | null;
-  fingerprint: string | null;
-  previousFingerprint: string | null;
-  fetchedAt: string;
-  contentBytes: number | null;
-  error: string | null;
-}
-
-export interface OnFarmCompostOfficialMonitorArtifact {
-  schemaVersion: "1";
-  artifactType: "demand_pulse_official_page_dry_run";
-  projectId: typeof ONFARMCOMPOST_PROJECT_ID;
-  mode: "dry_run";
-  publicationAllowed: false;
-  generatedAt: string;
-  localDate: string;
-  timezone: typeof TIME_ZONE;
-  sourceHealth: SourceHealthEntry[];
-  observations: DemandObservationCandidate[];
-  candidateCards: [];
-  summary: {
-    configuredSources: number;
-    successfulSources: number;
-    failedSources: number;
-    changedSources: number;
-    unchangedSources: number;
-  };
-  nextStage: "coverage_clustering_scoring_and_review_not_wired";
 }
 
 export type OnFarmCompostOfficialMonitorResult =
@@ -154,44 +104,6 @@ export function isPastDailyRunTime(local: LocalDateTime): boolean {
   return local.hour >= DAILY_RUN_HOUR;
 }
 
-function createObservation(
-  seed: OfficialPageSeed,
-  snapshot: OfficialPageSnapshot,
-  previousFingerprint: string | null,
-): DemandObservationCandidate {
-  return {
-    projectId: ONFARMCOMPOST_PROJECT_ID,
-    sourceConnectionId: `official-page:${seed.id}`,
-    sourceClass: "market_event_observed",
-    sourcePlatform: "official_page_monitor",
-    sourceDomain: new URL(snapshot.finalUrl).hostname,
-    externalId: `${seed.id}:${snapshot.fingerprint.slice(0, 20)}`,
-    canonicalUrl: snapshot.finalUrl,
-    title: snapshot.title,
-    excerpt: snapshot.excerpt,
-    publishedAt: snapshot.lastModified ?? snapshot.fetchedAt,
-    collectedAt: snapshot.fetchedAt,
-    locale: "en-US",
-    geography: seed.geography,
-    metadata: {
-      authorityClass: "primary_authoritative",
-      sourceId: seed.id,
-      topics: [...seed.topics],
-      fingerprint: snapshot.fingerprint,
-      previousFingerprint,
-      lastModified: snapshot.lastModified,
-      etag: snapshot.etag,
-      httpStatus: snapshot.httpStatus,
-      contentBytes: snapshot.contentBytes,
-      publicationDateBasis: snapshot.lastModified
-        ? "last-modified-header"
-        : "collection-time-fallback",
-      fullTextRetained: false,
-    },
-    retentionProfile: "official-public-metadata-v1",
-  };
-}
-
 function errorMessage(error: unknown): string {
   if (error instanceof Error) return error.message.slice(0, 500);
   return String(error).slice(0, 500);
@@ -203,7 +115,7 @@ async function collectSource(
   nextSources: Record<string, OfficialPageStateEntry>,
   fetchFn: OfficialPageFetch,
   generatedAt: string,
-): Promise<SourceResult> {
+): Promise<OfficialSourceResult> {
   const previous = previousState?.sources[seed.id] ?? null;
 
   try {
@@ -242,70 +154,6 @@ async function collectSource(
       error: errorMessage(error),
     };
   }
-}
-
-function isSuccessfulSource(
-  result: SourceResult,
-): result is SuccessfulSourceResult {
-  return result.snapshot !== null;
-}
-
-function buildSourceHealth(
-  results: SourceResult[],
-  generatedAt: string,
-): SourceHealthEntry[] {
-  return results.map((result) => ({
-    sourceId: result.seed.id,
-    requestedUrl: result.seed.url,
-    ok: result.snapshot !== null,
-    changed: result.changed,
-    httpStatus: result.snapshot?.httpStatus ?? null,
-    finalUrl: result.snapshot?.finalUrl ?? null,
-    fingerprint: result.snapshot?.fingerprint ?? null,
-    previousFingerprint: result.previousFingerprint,
-    fetchedAt: generatedAt,
-    contentBytes: result.snapshot?.contentBytes ?? null,
-    error: result.error,
-  }));
-}
-
-function buildArtifact(
-  results: SourceResult[],
-  successful: SuccessfulSourceResult[],
-  localDate: string,
-  generatedAt: string,
-): OnFarmCompostOfficialMonitorArtifact {
-  const observations = successful
-    .filter((result) => result.changed)
-    .map((result) =>
-      createObservation(
-        result.seed,
-        result.snapshot,
-        result.previousFingerprint,
-      ),
-    );
-
-  return {
-    schemaVersion: "1",
-    artifactType: "demand_pulse_official_page_dry_run",
-    projectId: ONFARMCOMPOST_PROJECT_ID,
-    mode: "dry_run",
-    publicationAllowed: false,
-    generatedAt,
-    localDate,
-    timezone: TIME_ZONE,
-    sourceHealth: buildSourceHealth(results, generatedAt),
-    observations,
-    candidateCards: [],
-    summary: {
-      configuredSources: results.length,
-      successfulSources: successful.length,
-      failedSources: results.length - successful.length,
-      changedSources: observations.length,
-      unchangedSources: successful.length - observations.length,
-    },
-    nextStage: "coverage_clustering_scoring_and_review_not_wired",
-  };
 }
 
 export async function runScheduledOnFarmCompostOfficialMonitor(
@@ -351,7 +199,7 @@ export async function runScheduledOnFarmCompostOfficialMonitor(
     (seed) =>
       collectSource(seed, previousState, nextSources, fetchFn, generatedAt),
   );
-  const successful = results.filter(isSuccessfulSource);
+  const successful = results.filter(isSuccessfulOfficialSource);
 
   if (successful.length < MINIMUM_SUCCESSFUL_SOURCES) {
     console.error(
@@ -364,7 +212,12 @@ export async function runScheduledOnFarmCompostOfficialMonitor(
     };
   }
 
-  const artifact = buildArtifact(results, successful, local.date, generatedAt);
+  const artifact = buildOnFarmCompostOfficialMonitorArtifact(
+    results,
+    successful,
+    local.date,
+    generatedAt,
+  );
   const nextState: OfficialPageState = {
     schemaVersion: "1",
     projectId: ONFARMCOMPOST_PROJECT_ID,
@@ -372,17 +225,22 @@ export async function runScheduledOnFarmCompostOfficialMonitor(
     sources: nextSources,
   };
 
-  // Preserve the evidence artifact before advancing fingerprints. If the state
-  // write fails, a later day may emit a duplicate change, but no change is lost.
+  // Preserve evidence before advancing fingerprints. A failed state write can
+  // cause a later duplicate observation, but it cannot erase a collected change.
   await writeJsonArtifact(env.R2, artifactKey, artifact, {
     projectId: ONFARMCOMPOST_PROJECT_ID,
     artifactType: artifact.artifactType,
     localDate: local.date,
   });
-  await writeJsonArtifact(env.R2, ONFARMCOMPOST_OFFICIAL_STATE_KEY, nextState, {
-    projectId: ONFARMCOMPOST_PROJECT_ID,
-    artifactType: "official-page-state",
-  });
+  await writeJsonArtifact(
+    env.R2,
+    ONFARMCOMPOST_OFFICIAL_STATE_KEY,
+    nextState,
+    {
+      projectId: ONFARMCOMPOST_PROJECT_ID,
+      artifactType: "official-page-state",
+    },
+  );
 
   console.log(
     `[demand-pulse] OnFarmCompost dry run wrote ${artifactKey}: ${artifact.summary.changedSources} changed, ${successful.length}/${results.length} healthy`,
