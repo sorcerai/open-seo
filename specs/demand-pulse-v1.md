@@ -1,92 +1,62 @@
-# Specification — Demand Pulse OnFarmCompost Canary
+# Specification — Demand Pulse v1 and Owned Attention handoff
 
 ## Status
 
-Approved design. Implement the full OnFarmCompost dry-run vertical slice before
-generalizing Demand Pulse into a reusable product feature.
+**Implemented canary; operational validation pending.**
+
+The OnFarmCompost vertical slice is on `main` after PR #6. The normalized schemas, repositories, scheduled acquisition, evidence processing, coverage checks, deterministic scoring, bounded review feed, decisions, hidden UI, and read-only MCP surfaces exist.
+
+Demand Pulse is **not** yet a generalized multi-project product. The seven-run usefulness gate remains the release boundary.
 
 ## Objective
 
-Prove that OpenSEO can turn bounded, source-labeled evidence into a small,
-project-tailored feed of useful actions without auto-publishing, hiding source
-failures, inflating corroboration, or creating an unbounded review queue.
+Prove that OpenSEO can turn bounded, source-labeled evidence into a small, project-tailored queue of useful actions without:
 
-OnFarmCompost is the first configured instance. Shared code must avoid
-hard-coding its market and editorial rules, but self-service onboarding and
-multi-project commercialization remain out of scope until the seven-run gate
-demonstrates measurable internal value.
+- auto-publishing;
+- hiding source failures;
+- inflating corroboration with duplicates or syndication;
+- treating generated prompts as observed demand;
+- inventing coverage certainty;
+- creating an unbounded review queue;
+- or optimizing traffic before proving user and business value.
+
+OnFarmCompost remains the first configured instance.
 
 ## Invariants
 
-1. Evidence classes remain distinct throughout acquisition, scoring, and display.
+1. Evidence classes remain distinct throughout acquisition, scoring, display, export, and outcome learning.
 2. Generated candidates cannot self-promote.
 3. Duplicate observations and independent evidence events are separate relations.
 4. Failed, blocked, or uncertain acquisition remains explicit and never becomes zero.
-5. Every feed item traces to versioned evidence, coverage checks, and scoring inputs.
+5. Every feed item traces to a versioned run, evidence graph, coverage check, score, and selection version.
 6. Sources require project-owner approval before collection.
 7. Feature and source flags default off; dry-run defaults on.
 8. No run emits more than five feed items.
-9. OpenSEO never publishes OnFarmCompost content.
-10. Reddit and restricted social sources remain disabled.
-11. D1 stores queryable relationships; R2 stores bounded versioned artifacts.
+9. OpenSEO never publishes project content.
+10. Reddit and restricted social sources remain disabled until approved.
+11. Queryable relationships stay normalized; JSON is limited to bounded versioned snapshots.
 12. SQLite and Postgres behavior remain compatible.
+13. Human review decisions never imply publication.
+14. Downstream systems must return outcomes against the original action lineage.
 
-## Architecture
+## Current architecture
 
-Build on `feat/official-source-monitor`. The existing OnFarmCompost official-page
-monitor becomes the first acquisition adapter rather than a parallel implementation.
+```text
+project profile and approved source registry
+  -> scheduled safety, cost, and idempotency gates
+  -> independent source acquisition
+  -> source-run health and observation persistence
+  -> exact/URL/syndication/semantic duplicate resolution
+  -> independent evidence-event graph
+  -> configured problem-family mapping
+  -> existing-page coverage evaluation
+  -> versioned scoring and penalties
+  -> bounded feed selection
+  -> hidden UI and read-only MCP
+  -> human review decision
+```
 
-The daily flow is:
-
-1. Resolve the registered OnFarmCompost profile.
-2. Enforce dry-run, no-publication, source approval, and daily budget.
-3. Acquire enabled source adapters independently.
-4. Persist source health and normalized observations.
-5. Resolve canonical duplicates and independent evidence events.
-6. Map evidence to configured problem families.
-7. compare families with the OnFarmCompost content inventory.
-8. Apply versioned score components and penalties.
-9. Persist at most five feed items.
-10. Write one bounded R2 artifact for the run.
-11. Expose canonical records through a hidden in-app feed and read-only MCP tools.
-
-No GitHub issue or PageSpace sink is part of this version.
-
-## Tailoring boundary
-
-The reusable core consists of:
-
-- normalized repositories and services
-- acquisition adapter interface
-- source approval states
-- observation and provenance contracts
-- duplicate and independence processing
-- family mapping and scoring
-- coverage-check interface
-- feed and review-decision services
-- read-only MCP response contracts
-
-OnFarmCompost supplies project-owned configuration for:
-
-- market and geography
-- problem-family seeds
-- source discovery queries
-- adapter permissions
-- GSC property
-- paid-acquisition budget
-- scoring weights and penalties
-- retention policy
-- coverage inventory
-- owners and review cadence
-
-Automatic discovery creates pending source records. A project owner must approve
-each source before acquisition. The canonical market/editorial policy remains in
-the OnFarmCompost repository; OpenSEO stores its source reference and the
-operational configuration needed to execute the canary.
-
-## Data model
-
-Use explicit normalized tables and foreign keys:
+### Implemented records
 
 - `demand_pulse_profiles`
 - `demand_pulse_sources`
@@ -103,110 +73,150 @@ Use explicit normalized tables and foreign keys:
 - `demand_pulse_feed_items`
 - `demand_pulse_decisions`
 
-Project, source, run, evidence, family, coverage, score, feed, and decision
-relationships must not be hidden in JSON columns. JSON is permitted only for
-bounded versioned payloads whose internal fields are not relational query keys,
-such as immutable score-vector snapshots.
+## Acquisition boundary
 
-## Acquisition
+The canary supports approved, bounded acquisition through:
 
-The first canary supports:
+- official-page monitoring;
+- GSC query-to-page evidence;
+- DataForSEO discussion/forum evidence;
+- redacted first-party imports;
+- Hacker News;
+- local-news discovery with original-source resolution.
 
-- approved official-source pages
-- existing GSC query-to-page evidence
-- bounded DataForSEO discovery and corroboration
-- redacted manual first-party imports
-- local-news discovery with original-source resolution
+Every adapter reports:
 
-Every adapter reports source health, policy state, cost, cursor, and explicit
-errors. Paid acquisition stops at the configured USD 1.00 daily ceiling while
-health reporting and free acquisition continue.
+- source identity and class;
+- approval/policy state;
+- health;
+- requests and cost;
+- cursor;
+- bounded observations;
+- warnings and explicit errors;
+- raw artifact pointers only where retention permits.
 
-## Processing
+A source flag being available is not approval to turn it on.
 
-Normalization preserves source class, exact bounded observed language,
-geography, provenance, retention metadata, and raw-artifact pointer when allowed.
+## Processing boundary
 
-Deduplication records exact duplicates, URL variants, syndication, copied
-questions, and semantic near-duplicates. Corroboration counts independent
-evidence events, not raw copies.
+Normalization preserves source class, bounded observed language, locale, geography, timestamps, provenance, retention metadata, and allowed artifact pointers.
 
-Family mapping uses the configured OnFarmCompost jobs and decisions. Each family
-retains all supporting observations and the language that caused the match.
+Deduplication records exact duplicates, URL variants, syndication, copied questions, and semantic near-duplicates. Corroboration counts independent evidence events, not copies.
 
-Coverage checks prefer correcting or updating an existing canonical page,
-adding a direct answer or asset, or changing a service/support workflow before
-recommending a new URL.
+Coverage evaluation prefers:
 
-Scoring stores positive components, penalties, scoring version, confidence, and
-the resulting action regime. Compliance risk can block promotion regardless of
-score.
+1. correcting or updating an existing canonical page;
+2. adding a direct answer, FAQ, table, tool, or asset;
+3. improving a service, support, or offer workflow;
+4. creating a genuinely distinct supporting page;
+5. monitoring or rejecting the signal.
 
-## Feed and review
+A new article is one possible action, not the default output.
 
-The hidden Demand Pulse route presents a project-scoped feed with:
+## Review boundary
 
-- why the item matters now
-- evidence classes and independent-event count
-- exact observed language
-- existing coverage
-- score components and penalties
-- recommended action
-- risks and uncertainty
-- source health and acquisition cost
+The hidden Demand Pulse surface shows:
 
-Owners can accept, reject, defer, or request research and must record a reason.
-Decisions never trigger content publication.
+- why the item matters now;
+- exact observed language;
+- evidence classes and independent-event count;
+- current coverage;
+- score components and penalties;
+- recommended action;
+- risks and uncertainty;
+- source health and acquisition cost;
+- exact lineage.
 
-Read-only MCP tools expose the same service layer:
+Owners can accept, reject, defer, or request more research. Decisions persist with `publicationTriggered=false`.
 
-- `list_demand_sources`
-- `get_demand_pulse`
-- `get_prompt_family`
-- `get_topic_evidence`
-- `get_demand_gaps`
+Current read-only MCP tools:
 
-No MCP write tool is included.
+- `get_demand_pulse_feed`
+- `get_demand_pulse_feed_item`
 
-## Failure behavior
+## Validation gate
 
-- One adapter failure does not erase successful evidence from other adapters.
-- A failed source run remains visible in D1, the R2 artifact, UI, and MCP.
-- Below the minimum healthy-source threshold, the run is incomplete and emits
-  no promoted feed items.
-- Missing coverage data yields `unknown`, not a clean coverage result.
-- Budget exhaustion blocks only additional paid acquisition and is reported.
-- Retries preserve idempotency through the daily run key and source-run keys.
-- Final execution rechecks dry-run and publication-disabled state.
+The canary must complete seven consecutive scheduled dry runs and review:
+
+- source health and cost;
+- false positives;
+- missed demand;
+- duplicate/corroboration accuracy;
+- coverage accuracy;
+- recommendation usefulness;
+- accepted versus rejected actions;
+- whether any accepted action produced measurable user or business value.
+
+Green code is necessary but does not establish recommendation usefulness.
+
+## v1.1 target: Owned Attention export
+
+After the seven-run gate, an **accepted** feed item may be mapped into a versioned `DemandActionEnvelope`.
+
+The exporter must:
+
+- preserve project, run, evidence, score, selection, family, coverage, and decision lineage;
+- expose observed facts separately from generated or inferred fields;
+- carry explicit unknowns instead of synthetic defaults;
+- include governance flags proving publication is still disallowed;
+- support a read-only server/MCP response before any write sink exists;
+- never create a page, ticket, video, campaign, or ad configuration by itself.
+
+Canonical design:
+
+- `docs/owned-attention/README.md`
+- `docs/owned-attention/DEMAND_ACTION_ENVELOPE_V1.md`
+- `docs/owned-attention/demand-action-envelope.v1.schema.json`
+- `docs/owned-attention/outcome-envelope.v1.schema.json`
+- `docs/owned-attention/AGENT_HANDOFF.md`
+
+## v1.2 target: outcome feedback
+
+One implemented downstream action must return an `OutcomeEnvelope` containing:
+
+- the original action event ID;
+- changed or created asset identifiers;
+- publication and distribution events;
+- traffic and engagement by source;
+- citation and AI-visibility changes;
+- lead, affiliate, product, sponsorship, or display revenue where applicable;
+- production, media, and maintenance cost;
+- attribution confidence and limitations;
+- quality, correction, policy, and stale-data incidents.
+
+Outcome ingestion must append measurements. It must not rewrite the historical demand evidence or retroactively improve the original score.
+
+## Explicit non-goals
+
+- Automatic publishing.
+- Automatic page creation from every signal.
+- Cold paid-traffic arbitrage.
+- Push-traffic acquisition.
+- Unreviewed Reddit ingestion.
+- A generalized social-listening SaaS.
+- A single magic demand score.
+- Treating pageviews as profit.
+- Letting downstream agents discard provenance.
+- Adding PageSpace or GitHub writes before the read-only export proves useful.
 
 ## Verification
 
-Each vertical slice must prove observable behavior:
+For code changes:
 
-1. Schema works on SQLite and Postgres migrations.
-2. Pending sources cannot be collected.
-3. Paid acquisition stops at the daily ceiling.
-4. Source failures survive every transformation and output.
-5. Duplicate copies do not inflate independent corroboration.
-6. Every feed item contains provenance and a coverage check.
-7. No run emits more than five feed items.
-8. UI and MCP enforce project authorization and return the same records.
-9. Decisions persist without invoking publication.
-10. Seven consecutive scheduled dry runs satisfy the canary acceptance gate.
+```bash
+pnpm ci:check
+pnpm test:ci
+pnpm build
+```
 
-Project gates are `pnpm ci:check`, `pnpm test:ci`, and `pnpm build`, plus a
-browser smoke test of source approval, the feed, and review decisions.
+Required behavioral tests for the next slice:
 
-## Delivery slices
-
-1. Fix the existing PR #5 baseline lint failure.
-2. Add profile/source/run schema and repositories.
-3. Add automatic source discovery and approval flow.
-4. Persist official-monitor output through the canonical repositories.
-5. Add GSC, DataForSEO, first-party, and local-news adapters.
-6. Add normalization, duplicate independence, family mapping, and scoring.
-7. Add coverage checks and bounded feed generation.
-8. Add hidden feed UI and human decisions.
-9. Add read-only MCP tools.
-10. Run the seven-run canary and review cost, false positives, missed signals,
-    accepted actions, and measurable outcomes before any generalization.
+1. Only an accepted, lineage-valid feed item can export.
+2. Export is read-only and idempotent.
+3. Unknown economics and coverage fields remain unknown.
+4. Generated evidence cannot masquerade as observed evidence.
+5. The envelope validates against the versioned schema.
+6. An unauthorized project cannot export another project's action.
+7. An outcome cannot attach to an unknown action event.
+8. Outcome ingestion appends history and never mutates original evidence.
+9. No export or outcome path can trigger publication.
