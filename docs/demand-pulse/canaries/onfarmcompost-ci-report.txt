@@ -1,0 +1,30 @@
+===== prettier (exit 0) =====
+Checking formatting...
+All matched files use Prettier code style!
+
+===== knip (exit 0) =====
+
+===== typescript (exit 0) =====
+
+===== oxlint (exit 1) =====
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1meslint(max-lines): File has too many lines (569).[0m
+     ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/canaries/onfarmcompost-official-monitor.ts[0m:624:2]
+ [2m623[0m │   };
+ [2m624[0m │ }
+     · [38;2;246;87;248m ▲[0m
+     ╰────
+[38;2;106;159;181m  help: [0mMaximum allowed is 400.
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1meslint-plugin-unicorn(no-useless-fallback-in-spread): Empty fallbacks in spreads are unnecessary[0m
+     ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/canaries/onfarmcompost-official-monitor.ts[0m:478:5]
+ [2m477[0m │   const nextSources: Record<string, OfficialPageStateEntry> = {
+ [2m478[0m │     ...(previousState?.sources ?? {}),
+     · [38;2;246;87;248m    ─────────────────────────────────[0m
+ [2m479[0m │   };
+     ╰────
+[38;2;106;159;181m  help: [0mSpreading falsy values in object literals won't add any unexpected properties, so it's unnecessary to add an empty object as fallback.
+
+Found 0 warnings and 2 errors.
+Finished in 975ms on 723 files with 159 rules using 4 threads.
+
