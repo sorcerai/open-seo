@@ -1,0 +1,64 @@
+name: Format Owned Attention Once
+
+on:
+  push:
+    branches:
+      - docs/owned-attention-v1
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: ${{ !contains(github.event.head_commit.message, '[skip format-owned-attention]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: docs/owned-attention-v1
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format Owned Attention contracts
+        run: |
+          pnpm exec prettier --write \
+            specs/demand-pulse-v1.md \
+            src/server/features/demand-pulse/README.md \
+            docs/owned-attention/README.md \
+            docs/owned-attention/DEMAND_ACTION_ENVELOPE_V1.md \
+            docs/owned-attention/AGENT_HANDOFF.md \
+            docs/owned-attention/demand-action-envelope.v1.schema.json \
+            docs/owned-attention/outcome-envelope.v1.schema.json
+
+      - name: Commit formatted files
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No formatting changes required."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            specs/demand-pulse-v1.md \
+            src/server/features/demand-pulse/README.md \
+            docs/owned-attention/README.md \
+            docs/owned-attention/DEMAND_ACTION_ENVELOPE_V1.md \
+            docs/owned-attention/AGENT_HANDOFF.md \
+            docs/owned-attention/demand-action-envelope.v1.schema.json \
+            docs/owned-attention/outcome-envelope.v1.schema.json
+          git commit -m "style(owned-attention): format contracts [skip format-owned-attention]"
+          git push origin HEAD:docs/owned-attention-v1
