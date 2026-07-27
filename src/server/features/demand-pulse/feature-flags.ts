@@ -5,7 +5,9 @@ export interface DemandPulseFeatureFlags {
   sourceDataForSeoDiscussions: boolean;
   sourceHackerNews: boolean;
   sourceFirstPartyImport: boolean;
+  sourceOfficialPages: boolean;
   sourceReddit: boolean;
+  canaryOnFarmCompost: boolean;
 }
 
 function envBoolean(value: string | undefined, fallback: boolean): boolean {
@@ -29,6 +31,14 @@ export function getDemandPulseFeatureFlags(
       env.DEMAND_PULSE_SOURCE_FIRST_PARTY_IMPORT,
       false,
     ),
+    sourceOfficialPages: envBoolean(
+      env.DEMAND_PULSE_SOURCE_OFFICIAL_PAGES,
+      false,
+    ),
     sourceReddit: envBoolean(env.DEMAND_PULSE_SOURCE_REDDIT, false),
+    canaryOnFarmCompost: envBoolean(
+      env.DEMAND_PULSE_CANARY_ONFARMCOMPOST,
+      false,
+    ),
   };
 }
