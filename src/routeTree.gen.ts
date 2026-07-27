@@ -44,6 +44,7 @@ import { Route as ProjectPProjectIdRankTrackingRouteImport } from './routes/_pro
 import { Route as ProjectPProjectIdPromptExplorerRouteImport } from './routes/_project/p/$projectId/prompt-explorer'
 import { Route as ProjectPProjectIdKeywordsRouteImport } from './routes/_project/p/$projectId/keywords'
 import { Route as ProjectPProjectIdDomainRouteImport } from './routes/_project/p/$projectId/domain'
+import { Route as ProjectPProjectIdDemandPulseRouteImport } from './routes/_project/p/$projectId/demand-pulse'
 import { Route as ProjectPProjectIdBrandLookupRouteImport } from './routes/_project/p/$projectId/brand-lookup'
 import { Route as ProjectPProjectIdBacklinksRouteImport } from './routes/_project/p/$projectId/backlinks'
 import { Route as ProjectPProjectIdAuditRouteImport } from './routes/_project/p/$projectId/audit'
@@ -232,6 +233,12 @@ const ProjectPProjectIdDomainRoute = ProjectPProjectIdDomainRouteImport.update({
   path: '/domain',
   getParentRoute: () => ProjectPProjectIdRouteRoute,
 } as any)
+const ProjectPProjectIdDemandPulseRoute =
+  ProjectPProjectIdDemandPulseRouteImport.update({
+    id: '/demand-pulse',
+    path: '/demand-pulse',
+    getParentRoute: () => ProjectPProjectIdRouteRoute,
+  } as any)
 const ProjectPProjectIdBrandLookupRoute =
   ProjectPProjectIdBrandLookupRouteImport.update({
     id: '/brand-lookup',
@@ -299,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/p/$projectId/audit': typeof ProjectPProjectIdAuditRouteWithChildren
   '/p/$projectId/backlinks': typeof ProjectPProjectIdBacklinksRoute
   '/p/$projectId/brand-lookup': typeof ProjectPProjectIdBrandLookupRoute
+  '/p/$projectId/demand-pulse': typeof ProjectPProjectIdDemandPulseRoute
   '/p/$projectId/domain': typeof ProjectPProjectIdDomainRoute
   '/p/$projectId/keywords': typeof ProjectPProjectIdKeywordsRoute
   '/p/$projectId/prompt-explorer': typeof ProjectPProjectIdPromptExplorerRoute
@@ -337,6 +345,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingIndexRoute
   '/p/$projectId/backlinks': typeof ProjectPProjectIdBacklinksRoute
   '/p/$projectId/brand-lookup': typeof ProjectPProjectIdBrandLookupRoute
+  '/p/$projectId/demand-pulse': typeof ProjectPProjectIdDemandPulseRoute
   '/p/$projectId/domain': typeof ProjectPProjectIdDomainRoute
   '/p/$projectId/keywords': typeof ProjectPProjectIdKeywordsRoute
   '/p/$projectId/prompt-explorer': typeof ProjectPProjectIdPromptExplorerRoute
@@ -381,6 +390,7 @@ export interface FileRoutesById {
   '/_project/p/$projectId/audit': typeof ProjectPProjectIdAuditRouteWithChildren
   '/_project/p/$projectId/backlinks': typeof ProjectPProjectIdBacklinksRoute
   '/_project/p/$projectId/brand-lookup': typeof ProjectPProjectIdBrandLookupRoute
+  '/_project/p/$projectId/demand-pulse': typeof ProjectPProjectIdDemandPulseRoute
   '/_project/p/$projectId/domain': typeof ProjectPProjectIdDomainRoute
   '/_project/p/$projectId/keywords': typeof ProjectPProjectIdKeywordsRoute
   '/_project/p/$projectId/prompt-explorer': typeof ProjectPProjectIdPromptExplorerRoute
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
     | '/p/$projectId/audit'
     | '/p/$projectId/backlinks'
     | '/p/$projectId/brand-lookup'
+    | '/p/$projectId/demand-pulse'
     | '/p/$projectId/domain'
     | '/p/$projectId/keywords'
     | '/p/$projectId/prompt-explorer'
@@ -461,6 +472,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/p/$projectId/backlinks'
     | '/p/$projectId/brand-lookup'
+    | '/p/$projectId/demand-pulse'
     | '/p/$projectId/domain'
     | '/p/$projectId/keywords'
     | '/p/$projectId/prompt-explorer'
@@ -504,6 +516,7 @@ export interface FileRouteTypes {
     | '/_project/p/$projectId/audit'
     | '/_project/p/$projectId/backlinks'
     | '/_project/p/$projectId/brand-lookup'
+    | '/_project/p/$projectId/demand-pulse'
     | '/_project/p/$projectId/domain'
     | '/_project/p/$projectId/keywords'
     | '/_project/p/$projectId/prompt-explorer'
@@ -781,6 +794,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectPProjectIdDomainRouteImport
       parentRoute: typeof ProjectPProjectIdRouteRoute
     }
+    '/_project/p/$projectId/demand-pulse': {
+      id: '/_project/p/$projectId/demand-pulse'
+      path: '/demand-pulse'
+      fullPath: '/p/$projectId/demand-pulse'
+      preLoaderRoute: typeof ProjectPProjectIdDemandPulseRouteImport
+      parentRoute: typeof ProjectPProjectIdRouteRoute
+    }
     '/_project/p/$projectId/brand-lookup': {
       id: '/_project/p/$projectId/brand-lookup'
       path: '/brand-lookup'
@@ -898,6 +918,7 @@ interface ProjectPProjectIdRouteRouteChildren {
   ProjectPProjectIdAuditRoute: typeof ProjectPProjectIdAuditRouteWithChildren
   ProjectPProjectIdBacklinksRoute: typeof ProjectPProjectIdBacklinksRoute
   ProjectPProjectIdBrandLookupRoute: typeof ProjectPProjectIdBrandLookupRoute
+  ProjectPProjectIdDemandPulseRoute: typeof ProjectPProjectIdDemandPulseRoute
   ProjectPProjectIdDomainRoute: typeof ProjectPProjectIdDomainRoute
   ProjectPProjectIdKeywordsRoute: typeof ProjectPProjectIdKeywordsRoute
   ProjectPProjectIdPromptExplorerRoute: typeof ProjectPProjectIdPromptExplorerRoute
@@ -914,6 +935,7 @@ const ProjectPProjectIdRouteRouteChildren: ProjectPProjectIdRouteRouteChildren =
     ProjectPProjectIdAuditRoute: ProjectPProjectIdAuditRouteWithChildren,
     ProjectPProjectIdBacklinksRoute: ProjectPProjectIdBacklinksRoute,
     ProjectPProjectIdBrandLookupRoute: ProjectPProjectIdBrandLookupRoute,
+    ProjectPProjectIdDemandPulseRoute: ProjectPProjectIdDemandPulseRoute,
     ProjectPProjectIdDomainRoute: ProjectPProjectIdDomainRoute,
     ProjectPProjectIdKeywordsRoute: ProjectPProjectIdKeywordsRoute,
     ProjectPProjectIdPromptExplorerRoute: ProjectPProjectIdPromptExplorerRoute,

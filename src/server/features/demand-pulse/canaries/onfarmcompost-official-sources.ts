@@ -1,5 +1,3 @@
-import { load } from "cheerio";
-
 const FETCH_TIMEOUT_MS = 15_000;
 const MAX_RESPONSE_BYTES = 1_500_000;
 const EXCERPT_LENGTH = 1_000;
@@ -125,11 +123,12 @@ function normalizeHost(value: string): string {
     .replace(/^www\./, "");
 }
 
-export function extractOfficialPageText(html: string): {
+export async function extractOfficialPageText(html: string): Promise<{
   title: string;
   text: string;
   excerpt: string;
-} {
+}> {
+  const { load } = await import("cheerio");
   const $ = load(html);
   $("script, style, noscript, template, svg").remove();
 
@@ -255,7 +254,7 @@ export async function fetchOfficialPageSnapshot(
     }
 
     const body = await readResponseTextBounded(response, MAX_RESPONSE_BYTES);
-    const extracted = extractOfficialPageText(body.text);
+    const extracted = await extractOfficialPageText(body.text);
     if (extracted.text.length < 100) {
       throw new Error("Official page returned insufficient readable text");
     }

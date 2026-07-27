@@ -260,6 +260,20 @@
       "when": 1784426967421,
       "tag": "0036_curvy_silk_fever",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "6",
+      "when": 1785132590449,
+      "tag": "0037_ancient_shiva",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "6",
+      "when": 1785142262362,
+      "tag": "0038_dear_stellaris",
+      "breakpoints": true
     }
   ]
 }

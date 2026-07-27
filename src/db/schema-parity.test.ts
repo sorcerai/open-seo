@@ -4,6 +4,11 @@ import { getTableColumns, getTableName, is, Table } from "drizzle-orm";
 import { getTableConfig as getSqliteTableConfig } from "drizzle-orm/sqlite-core";
 import { getTableConfig as getPgTableConfig } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
+import {
+  columnName,
+  sqlDefaultSignature,
+  sqlParts,
+} from "./schema-parity.test-utils";
 import * as sqliteApp from "./app.schema";
 import * as sqliteSam from "./sam.schema";
 import * as sqliteAuth from "./better-auth-schema";
@@ -11,6 +16,10 @@ import * as sqliteBilling from "./billing.schema";
 import * as sqliteGsc from "./gsc.schema";
 import * as sqliteReddit from "./reddit-attribution.schema";
 import * as sqliteTelemetry from "./telemetry.schema";
+import * as sqliteDemandPulse from "./demand-pulse.schema";
+import * as sqliteDemandPulseEvidence from "./demand-pulse-evidence.schema";
+import * as sqliteDemandPulseFamily from "./demand-pulse-family.schema";
+import * as sqliteDemandPulseFeed from "./demand-pulse-feed.schema";
 import * as pgApp from "./pg/app.schema";
 import * as pgSam from "./pg/sam.schema";
 import * as pgAuth from "./pg/better-auth-schema";
@@ -18,6 +27,10 @@ import * as pgBilling from "./pg/billing.schema";
 import * as pgGsc from "./pg/gsc.schema";
 import * as pgReddit from "./pg/reddit-attribution.schema";
 import * as pgTelemetry from "./pg/telemetry.schema";
+import * as pgDemandPulse from "./pg/demand-pulse.schema";
+import * as pgDemandPulseEvidence from "./pg/demand-pulse-evidence.schema";
+import * as pgDemandPulseFamily from "./pg/demand-pulse-family.schema";
+import * as pgDemandPulseFeed from "./pg/demand-pulse-feed.schema";
 
 // Guards the ONE structural artifact `db:generate` does not regenerate: the
 // hand-written Postgres schema. The provider-aware `db`/`@/db/schema` barrel
@@ -67,22 +80,14 @@ function columnsOf(table: Table): ColumnInfo[] {
   }));
 }
 
-function columnName(candidate: unknown): string | null {
-  if (
-    candidate &&
-    typeof candidate === "object" &&
-    "name" in candidate &&
-    typeof candidate.name === "string"
-  ) {
-    return candidate.name;
-  }
-  return null;
+function defaultOf(table: Table, name: string): unknown {
+  const column = Object.values(getTableColumns(table)).find(
+    (candidate) => candidate.name === name,
+  );
+  if (!column) throw new Error(`Missing column ${name}`);
+  return Reflect.get(column, "default");
 }
 
-// Unique constraints reduced to "sortedCols[|partial]" — including whether the
-// index carries a WHERE predicate so a partial→full change (which alters the
-// onConflict invariant) is caught even though the predicate text is dialect-
-// specific.
 function uniqueColumnTuples(table: Table, dialect: Dialect): string[] {
   const config = getConfig(table, dialect);
   const tuples = new Set<string>();
@@ -91,12 +96,10 @@ function uniqueColumnTuples(table: Table, dialect: Dialect): string[] {
     const cols = index.config.columns
       .map(columnName)
       .filter((name): name is string => name !== null);
-    tuples.add(
-      sortStrings(cols).join(",") + (index.config.where ? "|partial" : ""),
-    );
+    tuples.add(cols.join(",") + (index.config.where ? "|partial" : ""));
   }
   for (const constraint of config.uniqueConstraints) {
-    tuples.add(sortStrings(constraint.columns.map((c) => c.name)).join(","));
+    tuples.add(constraint.columns.map((c) => c.name).join(","));
   }
   for (const col of Object.values(getTableColumns(table))) {
     if (col.isUnique) tuples.add(col.name);
@@ -116,20 +119,65 @@ function primaryKeyColumns(table: Table, dialect: Dialect): string[] {
   return sortStrings([...pk]);
 }
 
-// FK as "cols->refTable.refCols onDelete=action" so a dropped/changed cascade is
-// caught (the parity property repositories rely on for cascading deletes).
+// FK signatures retain local[i]→foreign[i] positional mappings while sorting
+// the complete signature list for stable comparison.
 function foreignKeys(table: Table, dialect: Dialect): string[] {
   const config = getConfig(table, dialect);
   return sortStrings(
     config.foreignKeys.map((fk) => {
       const ref = fk.reference();
-      const cols = sortStrings(ref.columns.map((c) => c.name)).join(",");
+      const mapping = ref.columns
+        .map(
+          (column, index) =>
+            `${column.name}->${ref.foreignColumns[index]?.name ?? "?"}`,
+        )
+        .join(",");
       const refTable = getTableName(ref.foreignTable);
-      const refCols = sortStrings(ref.foreignColumns.map((c) => c.name)).join(
-        ",",
-      );
-      return `${cols}->${refTable}.${refCols} onDelete=${fk.onDelete ?? "none"}`;
+      return `${refTable}.${mapping} onDelete=${fk.onDelete ?? "none"}`;
     }),
+  );
+}
+
+function indexShapes(table: Table, dialect: Dialect): string[] {
+  const config = getConfig(table, dialect);
+  return sortStrings(
+    config.indexes.map((index) => {
+      const cols = index.config.columns
+        .map(columnName)
+        .filter((name): name is string => name !== null);
+      return `${index.config.name}|${cols.join(",")}|${index.config.unique ? "unique" : "index"}|${index.config.where ? "partial" : "full"}`;
+    }),
+  );
+}
+
+function checkShapes(table: Table, dialect: Dialect): string[] {
+  return sortStrings(
+    getConfig(table, dialect).checks.map((constraint) => {
+      const expression = sqlParts(constraint.value)
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .replace(/= false\b/g, "= 0")
+        .trim();
+      return `${constraint.name}:${expression}`;
+    }),
+  );
+}
+
+function normalizeDefault(value: unknown): string {
+  if (value !== null && typeof value === "object") {
+    return sqlDefaultSignature(value);
+  }
+  return JSON.stringify(value) ?? "undefined";
+}
+
+function defaultShapes(table: Table): string[] {
+  return sortStrings(
+    columnsOf(table)
+      .filter((column) => column.hasDefault)
+      .map((column) => {
+        const value = defaultOf(table, column.name);
+        return `${column.name}:${normalizeDefault(value)}`;
+      }),
   );
 }
 
@@ -140,6 +188,10 @@ const sqliteAppTables = tablesFrom(
   sqliteGsc,
   sqliteReddit,
   sqliteTelemetry,
+  sqliteDemandPulse,
+  sqliteDemandPulseEvidence,
+  sqliteDemandPulseFamily,
+  sqliteDemandPulseFeed,
 );
 const pgAppTables = tablesFrom(
   pgApp,
@@ -148,6 +200,10 @@ const pgAppTables = tablesFrom(
   pgGsc,
   pgReddit,
   pgTelemetry,
+  pgDemandPulse,
+  pgDemandPulseEvidence,
+  pgDemandPulseFamily,
+  pgDemandPulseFeed,
 );
 const sqliteAuthTables = tablesFrom(sqliteAuth);
 const pgAuthTables = tablesFrom(pgAuth);
@@ -185,8 +241,50 @@ describe("schema parity: application tables", () => {
           foreignKeys(sqliteTable, "sqlite"),
         );
       });
+      it("has matching indexes", () => {
+        expect(indexShapes(pgTable, "pg")).toEqual(
+          indexShapes(sqliteTable, "sqlite"),
+        );
+      });
+      it("has matching check constraints", () => {
+        expect(checkShapes(pgTable, "pg")).toEqual(
+          checkShapes(sqliteTable, "sqlite"),
+        );
+      });
+      it("has matching defaults", () => {
+        expect(defaultShapes(pgTable)).toEqual(defaultShapes(sqliteTable));
+      });
     });
   }
+});
+
+describe("schema parity: Demand Pulse safety defaults", () => {
+  it("keeps profile safety controls fail-closed on both dialects", () => {
+    for (const profile of [
+      sqliteDemandPulse.demandPulseProfiles,
+      pgDemandPulse.demandPulseProfiles,
+    ]) {
+      expect(defaultOf(profile, "enabled")).toBe(false);
+      expect(defaultOf(profile, "dry_run")).toBe(true);
+      expect(defaultOf(profile, "publication_disabled")).toBe(true);
+    }
+  });
+
+  it("allows unknown observation publication time in both dialects", () => {
+    for (const observations of [
+      sqliteDemandPulseEvidence.demandPulseObservations,
+      pgDemandPulseEvidence.demandPulseObservations,
+    ]) {
+      const publishedAt = columnsOf(observations).find(
+        (column) => column.name === "published_at",
+      );
+      expect(publishedAt?.notNull).toBe(false);
+      expect(
+        columnsOf(observations).find((column) => column.name === "collected_at")
+          ?.notNull,
+      ).toBe(true);
+    }
+  });
 });
 
 describe("schema parity: better-auth tables", () => {

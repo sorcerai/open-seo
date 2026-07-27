@@ -139,11 +139,23 @@ async function meterDataforseoCall<T>(
   execute: () => Promise<DataforseoApiResponse<T>>,
   creditFeature?: CreditFeature,
 ): Promise<T> {
+  const result = await meterDataforseoCallWithEnvelope(
+    customer,
+    execute,
+    creditFeature,
+  );
+  return result.data;
+}
+
+export async function meterDataforseoCallWithEnvelope<T>(
+  customer: BillingCustomerContext,
+  execute: () => Promise<DataforseoApiResponse<T>>,
+  creditFeature?: CreditFeature,
+): Promise<DataforseoApiResponse<T>> {
   const isHostedMode = await isHostedServerAuthMode();
 
   if (!isHostedMode) {
-    const result = await execute();
-    return result.data;
+    return execute();
   }
 
   const billingCustomer = await getOrCreateOrganizationCustomer(customer);
@@ -184,7 +196,7 @@ async function meterDataforseoCall<T>(
     creditFeature,
   });
 
-  return result.data;
+  return result;
 }
 
 async function trackDataforseoCost(args: {

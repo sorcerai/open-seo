@@ -7,7 +7,7 @@ import { resolveUserContextFromHeaders } from "@/middleware/ensure-user/resolve"
 import { ProjectRepository } from "@/server/features/projects/repositories/ProjectRepository";
 import { SamSessionRepository } from "@/server/features/sam/SamSessionRepository";
 import { runScheduledRankChecks } from "@/server/features/rank-tracking/services/scheduledRankChecks";
-import { runScheduledOnFarmCompostOfficialMonitor } from "@/server/features/demand-pulse/canaries/onfarmcompost-official-monitor";
+import { runScheduledDemandPulse } from "@/server/features/demand-pulse/services/dailyCanaryOrchestrator";
 import { getOrCreateOrganizationCustomer } from "@/server/billing/subscription";
 import { isHostedServerAuthMode } from "@/server/lib/runtime-env";
 import { getAuthMode, isHostedAuthMode } from "@/lib/auth-mode";
@@ -193,12 +193,9 @@ export default {
       await withPgClient(() => runScheduledRankChecks(env));
     } finally {
       try {
-        await runScheduledOnFarmCompostOfficialMonitor(env);
+        await withPgClient(() => runScheduledDemandPulse(env));
       } catch (error) {
-        console.error(
-          "[demand-pulse] OnFarmCompost official monitor failed:",
-          error,
-        );
+        console.error("[demand-pulse] daily canary failed:", error);
       }
     }
   },
