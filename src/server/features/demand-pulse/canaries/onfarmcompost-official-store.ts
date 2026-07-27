@@ -1,10 +1,8 @@
 import { z } from "zod";
 
 export const ONFARMCOMPOST_PROJECT_ID = "onfarmcompost";
-export const ONFARMCOMPOST_ARTIFACT_PREFIX =
-  "demand-pulse/onfarmcompost";
-export const ONFARMCOMPOST_OFFICIAL_STATE_KEY =
-  `${ONFARMCOMPOST_ARTIFACT_PREFIX}/state/official-pages.json`;
+export const ONFARMCOMPOST_ARTIFACT_PREFIX = "demand-pulse/onfarmcompost";
+export const ONFARMCOMPOST_OFFICIAL_STATE_KEY = `${ONFARMCOMPOST_ARTIFACT_PREFIX}/state/official-pages.json`;
 
 export interface DemandPulseJsonBody {
   text(): Promise<string>;

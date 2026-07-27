@@ -204,10 +204,8 @@ describe("runScheduledOnFarmCompostOfficialMonitor", () => {
     });
     expect(fetchFn).toHaveBeenCalledTimes(6);
 
-    const artifactKey =
-      "demand-pulse/onfarmcompost/runs/2026-07-26.json";
-    const stateKey =
-      "demand-pulse/onfarmcompost/state/official-pages.json";
+    const artifactKey = "demand-pulse/onfarmcompost/runs/2026-07-26.json";
+    const stateKey = "demand-pulse/onfarmcompost/state/official-pages.json";
     expect(bucket.putOrder).toEqual([artifactKey, stateKey]);
 
     const artifactText = bucket.objects.get(artifactKey);

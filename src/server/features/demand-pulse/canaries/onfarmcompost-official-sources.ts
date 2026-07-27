@@ -51,10 +51,7 @@ export const ONFARMCOMPOST_OFFICIAL_PAGE_SEEDS: readonly OfficialPageSeed[] = [
     id: "texas-ag-food-waste-composting",
     name: "Texas Attorney General Food Waste Composting Complaint",
     url: "https://www.texasattorneygeneral.gov/divisions/administrative-law/food-waste-composting-complaint",
-    allowedHosts: [
-      "www.texasattorneygeneral.gov",
-      "texasattorneygeneral.gov",
-    ],
+    allowedHosts: ["www.texasattorneygeneral.gov", "texasattorneygeneral.gov"],
     geography: "Texas",
     topics: [
       "Texas Health and Safety Code 364.020",
@@ -122,7 +119,10 @@ function normalizeWhitespace(value: string): string {
 }
 
 function normalizeHost(value: string): string {
-  return value.toLowerCase().replace(/\.$/, "").replace(/^www\./, "");
+  return value
+    .toLowerCase()
+    .replace(/\.$/, "")
+    .replace(/^www\./, "");
 }
 
 export function extractOfficialPageText(html: string): {
