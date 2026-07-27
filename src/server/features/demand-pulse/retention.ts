@@ -12,6 +12,16 @@ export interface DemandRetentionProfile {
 }
 
 const BASE_PROFILES: Record<DemandSourceClass, DemandRetentionProfile> = {
+  primary_authoritative: {
+    id: "primary-authoritative-v1",
+    rawContentDays: 365,
+    excerptDays: 730,
+    derivedFeatureDays: 1095,
+    storeAuthorIdentity: false,
+    mustHonorDeletion: true,
+    rehydrateOnDemand: true,
+    requiresLegalApproval: false,
+  },
   first_party_observed: {
     id: "first-party-controlled-v1",
     rawContentDays: 365,

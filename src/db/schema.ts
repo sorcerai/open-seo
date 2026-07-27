@@ -5,6 +5,14 @@ import * as sqliteSam from "./sam.schema";
 import * as sqliteAuth from "./better-auth-schema";
 import * as sqliteBilling from "./billing.schema";
 import * as sqliteGsc from "./gsc.schema";
+import * as sqliteDemandPulse from "./demand-pulse.schema";
+import * as sqliteDemandPulseEvidence from "./demand-pulse-evidence.schema";
+import {
+  demandPulseDuplicateEdges as sqliteDemandPulseDuplicateEdges,
+  demandPulseObservationEvents as sqliteDemandPulseObservationEvents,
+} from "./demand-pulse-evidence.schema";
+import * as sqliteDemandPulseFamily from "./demand-pulse-family.schema";
+import * as sqliteDemandPulseFeed from "./demand-pulse-feed.schema";
 import * as sqliteReddit from "./reddit-attribution.schema";
 import * as sqliteTelemetry from "./telemetry.schema";
 import * as pgApp from "./pg/app.schema";
@@ -13,6 +21,14 @@ import * as pgSam from "./pg/sam.schema";
 import * as pgAuth from "./pg/better-auth-schema";
 import * as pgBilling from "./pg/billing.schema";
 import * as pgGsc from "./pg/gsc.schema";
+import * as pgDemandPulse from "./pg/demand-pulse.schema";
+import * as pgDemandPulseEvidence from "./pg/demand-pulse-evidence.schema";
+import {
+  demandPulseDuplicateEdges as pgDemandPulseDuplicateEdges,
+  demandPulseObservationEvents as pgDemandPulseObservationEvents,
+} from "./pg/demand-pulse-evidence.schema";
+import * as pgDemandPulseFamily from "./pg/demand-pulse-family.schema";
+import * as pgDemandPulseFeed from "./pg/demand-pulse-feed.schema";
 import * as pgReddit from "./pg/reddit-attribution.schema";
 import * as pgTelemetry from "./pg/telemetry.schema";
 
@@ -32,6 +48,10 @@ type AppSchema = typeof sqliteApp &
   typeof sqliteAuth &
   typeof sqliteBilling &
   typeof sqliteGsc &
+  typeof sqliteDemandPulse &
+  typeof sqliteDemandPulseEvidence &
+  typeof sqliteDemandPulseFamily &
+  typeof sqliteDemandPulseFeed &
   typeof sqliteReddit &
   typeof sqliteTelemetry;
 
@@ -44,6 +64,12 @@ const runtimeSchema =
         ...pgAuth,
         ...pgBilling,
         ...pgGsc,
+        ...pgDemandPulse,
+        ...pgDemandPulseEvidence,
+        demandPulseObservationEvents: pgDemandPulseObservationEvents,
+        demandPulseDuplicateEdges: pgDemandPulseDuplicateEdges,
+        ...pgDemandPulseFamily,
+        ...pgDemandPulseFeed,
         ...pgReddit,
         ...pgTelemetry,
       }
@@ -54,6 +80,12 @@ const runtimeSchema =
         ...sqliteAuth,
         ...sqliteBilling,
         ...sqliteGsc,
+        ...sqliteDemandPulse,
+        ...sqliteDemandPulseEvidence,
+        demandPulseObservationEvents: sqliteDemandPulseObservationEvents,
+        demandPulseDuplicateEdges: sqliteDemandPulseDuplicateEdges,
+        ...sqliteDemandPulseFamily,
+        ...sqliteDemandPulseFeed,
         ...sqliteReddit,
         ...sqliteTelemetry,
       };
@@ -91,6 +123,20 @@ export const {
   invitation,
   billingCustomerStatus,
   gscConnections,
+  demandPulseProfiles,
+  demandPulseSources,
+  demandPulseRuns,
+  demandPulseSourceRuns,
+  demandPulseObservations,
+  demandPulseEvidenceEvents,
+  demandPulseObservationEvents,
+  demandPulseDuplicateEdges,
+  demandPulseFamilies,
+  demandPulseFamilyEvidence,
+  demandPulseCoverageChecks,
+  demandPulseScores,
+  demandPulseFeedItems,
+  demandPulseDecisions,
   redditAttributions,
   telemetryState,
 } = schema;

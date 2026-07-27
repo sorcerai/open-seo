@@ -5,7 +5,21 @@ export interface DemandPulseFeatureFlags {
   sourceDataForSeoDiscussions: boolean;
   sourceHackerNews: boolean;
   sourceFirstPartyImport: boolean;
+  sourceOfficialPages: boolean;
   sourceReddit: boolean;
+  canaryOnFarmCompost: boolean;
+}
+
+export interface DemandPulseFeatureFlagEnv {
+  DEMAND_PULSE_ENABLED?: string;
+  DEMAND_PULSE_WRITE_ENABLED?: string;
+  DEMAND_PULSE_DRY_RUN?: string;
+  DEMAND_PULSE_SOURCE_DATAFORSEO_DISCUSSIONS?: string;
+  DEMAND_PULSE_SOURCE_HACKER_NEWS?: string;
+  DEMAND_PULSE_SOURCE_FIRST_PARTY_IMPORT?: string;
+  DEMAND_PULSE_SOURCE_OFFICIAL_PAGES?: string;
+  DEMAND_PULSE_SOURCE_REDDIT?: string;
+  DEMAND_PULSE_CANARY_ONFARMCOMPOST?: string;
 }
 
 function envBoolean(value: string | undefined, fallback: boolean): boolean {
@@ -14,7 +28,7 @@ function envBoolean(value: string | undefined, fallback: boolean): boolean {
 }
 
 export function getDemandPulseFeatureFlags(
-  env: Record<string, string | undefined>,
+  env: DemandPulseFeatureFlagEnv,
 ): DemandPulseFeatureFlags {
   return {
     enabled: envBoolean(env.DEMAND_PULSE_ENABLED, false),
@@ -29,6 +43,14 @@ export function getDemandPulseFeatureFlags(
       env.DEMAND_PULSE_SOURCE_FIRST_PARTY_IMPORT,
       false,
     ),
+    sourceOfficialPages: envBoolean(
+      env.DEMAND_PULSE_SOURCE_OFFICIAL_PAGES,
+      false,
+    ),
     sourceReddit: envBoolean(env.DEMAND_PULSE_SOURCE_REDDIT, false),
+    canaryOnFarmCompost: envBoolean(
+      env.DEMAND_PULSE_CANARY_ONFARMCOMPOST,
+      false,
+    ),
   };
 }

@@ -10,6 +10,10 @@ import { createProjectTool } from "@/server/mcp/tools/create-project";
 import { listProjectsTool } from "@/server/mcp/tools/list-projects";
 import { listSavedKeywordsTool } from "@/server/mcp/tools/list-saved-keywords";
 import {
+  getDemandPulseFeedItemTool,
+  getDemandPulseFeedTool,
+} from "@/server/mcp/tools/demand-pulse-tools";
+import {
   findSerpCompetitorsTool,
   getGoogleBusinessQuestionsTool,
   getKeywordMetricsTool,
@@ -71,6 +75,24 @@ export function registerOpenSeoMcpTools(server: McpServer) {
       listSavedKeywordsTool.name,
       listSavedKeywordsTool.config.outputSchema,
       listSavedKeywordsTool.handler,
+    ),
+  );
+  server.registerTool(
+    getDemandPulseFeedTool.name,
+    getDemandPulseFeedTool.config,
+    instrumentMcpToolHandler(
+      getDemandPulseFeedTool.name,
+      getDemandPulseFeedTool.config.outputSchema,
+      getDemandPulseFeedTool.handler,
+    ),
+  );
+  server.registerTool(
+    getDemandPulseFeedItemTool.name,
+    getDemandPulseFeedItemTool.config,
+    instrumentMcpToolHandler(
+      getDemandPulseFeedItemTool.name,
+      getDemandPulseFeedItemTool.config.outputSchema,
+      getDemandPulseFeedItemTool.handler,
     ),
   );
   server.registerTool(

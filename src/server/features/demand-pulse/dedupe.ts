@@ -1,4 +1,8 @@
-import type { DemandObservationCandidate } from "./types";
+import {
+  DEMAND_PULSE_EVIDENCE_VERSION,
+  type DemandObservationCandidate,
+  type DuplicateRelationKind,
+} from "./types";
 
 const TRACKING_PARAMS = new Set([
   "fbclid",
@@ -47,6 +51,17 @@ export function canonicalizeDemandUrl(value: string): string {
   }
 }
 
+/** A valid, non-empty http(s) URL that canonicalizeDemandUrl can compare safely. */
+function isValidDemandUrl(value: string): boolean {
+  if (!value || !value.trim()) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function tokens(value: string): Set<string> {
   return new Set(
     normalizeDemandText(value)
@@ -66,6 +81,12 @@ export function jaccardSimilarity(left: string, right: string): number {
   return intersection / (a.size + b.size - intersection);
 }
 
+/**
+ * Legacy 32-bit FNV-1a fingerprint. Retained for non-persisted, non-identity
+ * uses only. Persisted observation/event/feed identifiers use {@link digestId}
+ * (domain-separated, length-delimited SHA-256) instead, because a 32-bit digest
+ * is not collision-resistant enough to key stored records.
+ */
 export function stableDemandFingerprint(value: string): string {
   const input = normalizeDemandText(value);
   let hash = 0x811c9dc5;
@@ -76,7 +97,39 @@ export function stableDemandFingerprint(value: string): string {
   return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
-function hoursBetween(left: string, right: string): number {
+// Worker-compatible SHA-256 (WebCrypto). 256-bit, collision-resistant. The
+// canary's official-page monitor already uses this pattern; reusing it keeps a
+// single hashing primitive across the feature.
+async function sha256Hex(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(value),
+  );
+  return Array.from(new Uint8Array(digest), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
+}
+
+/**
+ * Length-delimited encoding of a canonical tuple. Each part is prefixed with its
+ * length so `("a","bc")` and `("ab","c")` never collide, and no field is
+ * text-normalized before hashing (the URL component is preserved verbatim). The
+ * domain tag is mixed in as the first part so observation/event/feed ids cannot
+ * collide across domains even for identical payloads.
+ */
+function lengthDelimited(parts: readonly string[]): string {
+  return parts.map((part) => `${part.length}:${part}`).join("|");
+}
+
+export async function digestId(
+  domain: string,
+  parts: readonly string[],
+): Promise<string> {
+  return `${domain}_${await sha256Hex(lengthDelimited([domain, DEMAND_PULSE_EVIDENCE_VERSION, ...parts]))}`;
+}
+
+function hoursBetween(left: string | null, right: string | null): number {
+  if (!left || !right) return Number.POSITIVE_INFINITY;
   const a = Date.parse(left);
   const b = Date.parse(right);
   if (!Number.isFinite(a) || !Number.isFinite(b))
@@ -89,33 +142,48 @@ export interface DuplicateDecision {
   isCrossPost: boolean;
   reason: string;
   titleSimilarity: number;
+  /**
+   * Classified duplicate relation. null only when the two observations are
+   * distinct. Confident cross-posts are classified as `syndicated` so copied
+   * community evidence collapses into one independent event.
+   */
+  relation: DuplicateRelationKind | null;
 }
 
 export function compareDemandObservations(
   left: DemandObservationCandidate,
   right: DemandObservationCandidate,
 ): DuplicateDecision {
-  if (
-    left.sourcePlatform === right.sourcePlatform &&
-    left.externalId === right.externalId
-  ) {
+  const samePlatform = left.sourcePlatform === right.sourcePlatform;
+  const sameConnection = left.sourceConnectionId === right.sourceConnectionId;
+
+  // Scoped record identity (covers the URL-less first-party record-id path):
+  // two records from the same connection with the same external id are the same
+  // observation.
+  if (sameConnection && left.externalId === right.externalId) {
     return {
       isDuplicate: true,
       isCrossPost: false,
-      reason: "same_source_external_id",
+      reason: "same_source_record_id",
       titleSimilarity: 1,
+      relation: "exact",
     };
   }
 
+  // Canonical URL equality only when BOTH sides carry a valid non-empty URL, so
+  // URL-less observations can never collapse on an empty-string match.
   if (
+    isValidDemandUrl(left.canonicalUrl) &&
+    isValidDemandUrl(right.canonicalUrl) &&
     canonicalizeDemandUrl(left.canonicalUrl) ===
-    canonicalizeDemandUrl(right.canonicalUrl)
+      canonicalizeDemandUrl(right.canonicalUrl)
   ) {
     return {
       isDuplicate: true,
-      isCrossPost: left.sourcePlatform !== right.sourcePlatform,
+      isCrossPost: !samePlatform,
       reason: "same_canonical_url",
       titleSimilarity: 1,
+      relation: "canonical",
     };
   }
 
@@ -124,25 +192,43 @@ export function compareDemandObservations(
   const crossPostWindow =
     hoursBetween(left.publishedAt, right.publishedAt) <= 24 * 14;
 
-  if (titleSimilarity >= 0.86 && nearInTime) {
+  // Confident cross-posts: the same discussion republicated across platforms.
+  // These are syndicated duplicates (one independent event), not independent
+  // evidence, so copied community discussion cannot inflate corroboration.
+  if (!samePlatform && titleSimilarity >= 0.78 && crossPostWindow) {
     return {
       isDuplicate: true,
-      isCrossPost: left.sourcePlatform !== right.sourcePlatform,
-      reason: "near_identical_title_and_time",
+      isCrossPost: true,
+      reason: "syndicated_cross_post",
       titleSimilarity,
+      relation: "syndicated",
     };
   }
 
+  if (samePlatform && titleSimilarity >= 0.86 && nearInTime) {
+    return {
+      isDuplicate: true,
+      isCrossPost: false,
+      reason: "near_identical_title_and_time",
+      titleSimilarity,
+      relation: "exact",
+    };
+  }
+
+  // Same-platform semantic near-duplicates: the same source repackaging the
+  // same question with different wording.
   if (
-    left.sourcePlatform !== right.sourcePlatform &&
-    titleSimilarity >= 0.78 &&
-    crossPostWindow
+    samePlatform &&
+    titleSimilarity >= 0.7 &&
+    titleSimilarity < 0.86 &&
+    nearInTime
   ) {
     return {
-      isDuplicate: false,
-      isCrossPost: true,
-      reason: "likely_cross_post",
+      isDuplicate: true,
+      isCrossPost: false,
+      reason: "semantic_near_duplicate",
       titleSimilarity,
+      relation: "semantic",
     };
   }
 
@@ -151,5 +237,53 @@ export function compareDemandObservations(
     isCrossPost: false,
     reason: "distinct",
     titleSimilarity,
+    relation: null,
   };
+}
+
+/**
+ * Stable id for a single observation, derived from platform + source connection
+ * + external id + canonical url via a domain-separated, length-delimited
+ * SHA-256 digest. No text normalization is applied (the canonical url is hashed
+ * verbatim), so the documented canonical-url component is part of the identity.
+ */
+export async function observationEvidenceId(
+  observation: Pick<
+    DemandObservationCandidate,
+    "sourcePlatform" | "sourceConnectionId" | "externalId" | "canonicalUrl"
+  >,
+): Promise<string> {
+  return digestId("obs", [
+    observation.sourcePlatform,
+    observation.sourceConnectionId,
+    observation.externalId,
+    observation.canonicalUrl,
+  ]);
+}
+
+// Day bucket for event identity. Missing/invalid dates contribute "" so they
+// never fabricate a time anchor (baseline/unknown dates create no freshness).
+function parseObservationDay(value: string | null): string {
+  if (!value) return "";
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp)
+    ? new Date(timestamp).toISOString().slice(0, 10)
+    : "";
+}
+
+/**
+ * Canonical content key for the event an observation belongs to: normalized
+ * title + publication day. This is host/url-agnostic so exact, canonical, and
+ * syndicated duplicates of the same discussion share one event key, and it is
+ * stable regardless of which sources surface the event. The event id is this
+ * key of the event's first-observed anchor (see groupEvidenceEvents), not the
+ * minimum member hash, so discovering a later duplicate never rekeys the event.
+ */
+export async function canonicalEvidenceId(
+  observation: Pick<DemandObservationCandidate, "title" | "publishedAt">,
+): Promise<string> {
+  return digestId("evt", [
+    normalizeDemandText(observation.title),
+    parseObservationDay(observation.publishedAt),
+  ]);
 }
