@@ -6,7 +6,9 @@ All matched files use Prettier code style!
 
 ===== typescript (exit 0) =====
 
-===== oxlint (exit 1) =====
+===== badseo-typescript (exit 0) =====
+
+===== oxlint-type-aware (exit 1) =====
 
   [38;2;225;80;80;1m×[0m [38;2;225;80;80;1meslint(max-lines): File has too many lines (569).[0m
      ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/canaries/onfarmcompost-official-monitor.ts[0m:624:2]
@@ -25,6 +27,113 @@ All matched files use Prettier code style!
      ╰────
 [38;2;106;159;181m  help: [0mSpreading falsy values in object literals won't add any unexpected properties, so it's unnecessary to add an empty object as fallback.
 
-Found 0 warnings and 2 errors.
-Finished in 975ms on 723 files with 159 rules using 4 threads.
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1mtypescript-eslint(no-unsafe-type-assertion): Unsafe type assertion: type 'Record<string, string | undefined>' is more narrow than the original type.[0m
+     ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/canaries/onfarmcompost-official-monitor.ts[0m:444:5]
+ [2m443[0m │   const flags = getDemandPulseFeatureFlags(
+ [2m444[0m │     env as unknown as Record<string, string | undefined>,
+     · [38;2;246;87;248m    ────────────────────────────────────────────────────[0m
+ [2m445[0m │   );
+     ╰────
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1mtypescript-eslint(no-unsafe-type-assertion): Unsafe type assertion: type 'R2Object' is more narrow than the original type.[0m
+    ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/__tests__/official-monitor.test.ts[0m:15:37]
+ [2m14[0m │   async head(key: string) {
+ [2m15[0m │     return this.objects.has(key) ? ({ key } as R2Object) : null;
+    · [38;2;246;87;248m                                    ───────────────────[0m
+ [2m16[0m │   }
+    ╰────
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1mtypescript-eslint(no-unsafe-type-assertion): Unsafe type assertion: type 'R2ObjectBody' is more narrow than the original type.[0m
+    ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/__tests__/official-monitor.test.ts[0m:21:12]
+ [2m20[0m │         if (value === undefined) return null;
+ [2m21[0m │ [38;2;246;87;248m╭[0m[38;2;246;87;248m─[0m[38;2;246;87;248m▶[0m     return {
+ [2m22[0m │ [38;2;246;87;248m│[0m         key,
+ [2m23[0m │ [38;2;246;87;248m│[0m         async json<T>() {
+ [2m24[0m │ [38;2;246;87;248m│[0m           return JSON.parse(value) as T;
+ [2m25[0m │ [38;2;246;87;248m│[0m         },
+ [2m26[0m │ [38;2;246;87;248m╰[0m[38;2;246;87;248m─[0m[38;2;246;87;248m▶[0m     } as R2ObjectBody;
+ [2m27[0m │       }
+    ╰────
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1mtypescript-eslint(no-unsafe-type-assertion): Unsafe assertion from `any` detected: consider using type guards or a safer assertion.[0m
+    ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/__tests__/official-monitor.test.ts[0m:24:16]
+ [2m23[0m │       async json<T>() {
+ [2m24[0m │         return JSON.parse(value) as T;
+    · [38;2;246;87;248m               ──────────────────────[0m
+ [2m25[0m │       },
+    ╰────
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1mtypescript-eslint(no-unsafe-type-assertion): Unsafe type assertion: type 'R2Object' is more narrow than the original type.[0m
+    ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/__tests__/official-monitor.test.ts[0m:34:12]
+ [2m33[0m │     this.objects.set(key, value);
+ [2m34[0m │     return { key } as R2Object;
+    · [38;2;246;87;248m           ───────────────────[0m
+ [2m35[0m │   }
+    ╰────
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1mtypescript-eslint(no-unsafe-type-assertion): Unsafe type assertion: type 'Env' is more narrow than the original type.[0m
+    ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/__tests__/official-monitor.test.ts[0m:39:10]
+ [2m38[0m │     function enabledEnv(bucket: MemoryR2): Env {
+ [2m39[0m │ [38;2;246;87;248m╭[0m[38;2;246;87;248m─[0m[38;2;246;87;248m▶[0m   return {
+ [2m40[0m │ [38;2;246;87;248m│[0m       R2: bucket as unknown as R2Bucket,
+ [2m41[0m │ [38;2;246;87;248m│[0m       DEMAND_PULSE_ENABLED: "true",
+ [2m42[0m │ [38;2;246;87;248m│[0m       DEMAND_PULSE_WRITE_ENABLED: "false",
+ [2m43[0m │ [38;2;246;87;248m│[0m       DEMAND_PULSE_DRY_RUN: "true",
+ [2m44[0m │ [38;2;246;87;248m│[0m       DEMAND_PULSE_SOURCE_OFFICIAL_PAGES: "true",
+ [2m45[0m │ [38;2;246;87;248m│[0m       DEMAND_PULSE_CANARY_ONFARMCOMPOST: "true",
+ [2m46[0m │ [38;2;246;87;248m╰[0m[38;2;246;87;248m─[0m[38;2;246;87;248m▶[0m   } as unknown as Env;
+ [2m47[0m │     }
+    ╰────
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1mtypescript-eslint(no-unsafe-type-assertion): Unsafe type assertion: type 'R2Bucket' is more narrow than the original type.[0m
+    ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/__tests__/official-monitor.test.ts[0m:40:9]
+ [2m39[0m │   return {
+ [2m40[0m │     R2: bucket as unknown as R2Bucket,
+    · [38;2;246;87;248m        ─────────────────────────────[0m
+ [2m41[0m │     DEMAND_PULSE_ENABLED: "true",
+    ╰────
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1mtypescript-eslint(no-unsafe-type-assertion): Unsafe type assertion: type '{ (input: URL | RequestInfo, init?: RequestInit<CfProperties<unknown>> | undefined): Promise<Response>; (input: URL | RequestInfo, init?: RequestInit<...> | undefined): Promise<...>; (input: string | ... 1 more ... | URL, init?: RequestInit<...> | undefined): Promise<...>; }' is more narrow than the original type.[0m
+    ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/__tests__/official-monitor.test.ts[0m:55:10]
+ [2m54[0m │     
+ [2m55[0m │ [38;2;246;87;248m╭[0m[38;2;246;87;248m─[0m[38;2;246;87;248m▶[0m   return vi.fn(async () =>
+ [2m56[0m │ [38;2;246;87;248m│[0m       Promise.resolve(
+ [2m57[0m │ [38;2;246;87;248m│[0m         new Response(body, {
+ [2m58[0m │ [38;2;246;87;248m│[0m           status: 200,
+ [2m59[0m │ [38;2;246;87;248m│[0m           headers: {
+ [2m60[0m │ [38;2;246;87;248m│[0m             "content-type": "text/html; charset=utf-8",
+ [2m61[0m │ [38;2;246;87;248m│[0m             "last-modified": "Sun, 26 Jul 2026 12:00:00 GMT",
+ [2m62[0m │ [38;2;246;87;248m│[0m             etag: '"official-v1"',
+ [2m63[0m │ [38;2;246;87;248m│[0m           },
+ [2m64[0m │ [38;2;246;87;248m│[0m         }),
+ [2m65[0m │ [38;2;246;87;248m│[0m       ),
+ [2m66[0m │ [38;2;246;87;248m╰[0m[38;2;246;87;248m─[0m[38;2;246;87;248m▶[0m   ) as unknown as typeof fetch;
+ [2m67[0m │     }
+    ╰────
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1mtypescript-eslint(no-unsafe-type-assertion): Unsafe assertion from `any` detected: consider using type guards or a safer assertion.[0m
+     ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/__tests__/official-monitor.test.ts[0m:185:22]
+ [2m184[0m │         expect(artifactText).toBeDefined();
+ [2m185[0m │ [38;2;246;87;248m╭[0m[38;2;246;87;248m─[0m[38;2;246;87;248m▶[0m     const artifact = JSON.parse(artifactText ?? "{}") as {
+ [2m186[0m │ [38;2;246;87;248m│[0m         publicationAllowed: boolean;
+ [2m187[0m │ [38;2;246;87;248m│[0m         observations: Array<{ excerpt: string }>;
+ [2m188[0m │ [38;2;246;87;248m│[0m         candidateCards: unknown[];
+ [2m189[0m │ [38;2;246;87;248m│[0m         summary: { successfulSources: number; changedSources: number };
+ [2m190[0m │ [38;2;246;87;248m│[0m         nextStage: string;
+ [2m191[0m │ [38;2;246;87;248m╰[0m[38;2;246;87;248m─[0m[38;2;246;87;248m▶[0m     };
+ [2m192[0m │     
+     ╰────
+
+  [38;2;225;80;80;1m×[0m [38;2;225;80;80;1mtypescript-eslint(no-unsafe-type-assertion): Unsafe type assertion: type 'Env' is more narrow than the original type.[0m
+     ╭─[[38;2;92;157;255;1msrc/server/features/demand-pulse/__tests__/official-monitor.test.ts[0m:235:17]
+ [2m234[0m │         const bucket = new MemoryR2();
+ [2m235[0m │ [38;2;246;87;248m╭[0m[38;2;246;87;248m─[0m[38;2;246;87;248m▶[0m     const env = {
+ [2m236[0m │ [38;2;246;87;248m│[0m         ...enabledEnv(bucket),
+ [2m237[0m │ [38;2;246;87;248m│[0m         DEMAND_PULSE_WRITE_ENABLED: "true",
+ [2m238[0m │ [38;2;246;87;248m╰[0m[38;2;246;87;248m─[0m[38;2;246;87;248m▶[0m     } as unknown as Env;
+ [2m239[0m │     
+     ╰────
+
+Found 0 warnings and 12 errors.
+Finished in 6.5s on 723 files with 184 rules using 4 threads.
 
