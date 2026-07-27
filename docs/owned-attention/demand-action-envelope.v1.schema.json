@@ -27,10 +27,7 @@
       "format": "uuid"
     },
     "supersedesEventId": {
-      "type": [
-        "string",
-        "null"
-      ],
+      "type": ["string", "null"],
       "format": "uuid"
     },
     "projectId": {
@@ -109,18 +106,12 @@
           "maxLength": 256
         },
         "coverageCheckId": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "minLength": 1,
           "maxLength": 256
         },
         "scoreId": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "minLength": 1,
           "maxLength": 256
         },
@@ -150,24 +141,15 @@
           "maxLength": 1000
         },
         "problemStatement": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "maxLength": 4000
         },
         "intent": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "maxLength": 128
         },
         "funnelStage": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "enum": [
             "awareness",
             "consideration",
@@ -178,10 +160,7 @@
           ]
         },
         "temporalRegime": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "enum": [
             "emerging",
             "persistent",
@@ -194,17 +173,11 @@
           ]
         },
         "locale": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "maxLength": 64
         },
         "geography": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "maxLength": 256
         }
       }
@@ -294,13 +267,7 @@
         },
         "sourceHealth": {
           "type": "string",
-          "enum": [
-            "healthy",
-            "degraded",
-            "incomplete",
-            "failed",
-            "unknown"
-          ]
+          "enum": ["healthy", "degraded", "incomplete", "failed", "unknown"]
         },
         "limitations": {
           "type": "array",
@@ -316,12 +283,7 @@
     "coverage": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "status",
-        "candidateUrls",
-        "reason",
-        "recommendedAction"
-      ],
+      "required": ["status", "candidateUrls", "reason", "recommendedAction"],
       "properties": {
         "status": {
           "type": "string",
@@ -346,10 +308,7 @@
           }
         },
         "reason": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "maxLength": 4000
         },
         "recommendedAction": {
@@ -376,13 +335,7 @@
     "decision": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "kind",
-        "action",
-        "reason",
-        "reviewedBy",
-        "reviewedAt"
-      ],
+      "required": ["kind", "action", "reason", "reviewedBy", "reviewedAt"],
       "properties": {
         "kind": {
           "const": "accept"
@@ -433,17 +386,8 @@
       ],
       "properties": {
         "businessValue": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "low",
-            "medium",
-            "high",
-            "unknown",
-            null
-          ]
+          "type": ["string", "null"],
+          "enum": ["low", "medium", "high", "unknown", null]
         },
         "monetizationCandidates": {
           "type": "array",
@@ -463,34 +407,17 @@
           }
         },
         "estimatedProductionHours": {
-          "type": [
-            "number",
-            "null"
-          ],
+          "type": ["number", "null"],
           "minimum": 0,
           "maximum": 10000
         },
         "maintenanceRisk": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "low",
-            "medium",
-            "high",
-            "unknown",
-            null
-          ]
+          "type": ["string", "null"],
+          "enum": ["low", "medium", "high", "unknown", null]
         },
         "confidence": {
           "type": "string",
-          "enum": [
-            "low",
-            "medium",
-            "high",
-            "unknown"
-          ]
+          "enum": ["low", "medium", "high", "unknown"]
         }
       }
     },

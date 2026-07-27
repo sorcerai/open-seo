@@ -58,16 +58,16 @@ The system arbitrages:
 
 ## Repository ownership
 
-| System | Owns | Must not own |
-| --- | --- | --- |
-| **OpenSEO Demand Pulse** | Source acquisition, source health, observations, provenance, dedupe, independent evidence, problem-family feed, initial coverage and score lineage | Publishing, creative production, ad placement, final business claims |
-| **Constellation** | Prompt Demand Graph, prompt-to-page fit, citation/retrieval evidence, competitor and coverage analysis, action prioritization, stability, outcome interpretation | Raw unrestricted social archives, autonomous publishing, anonymous recommendations without lineage |
-| **Project repository** | Canonical facts, approved content, tools, schemas, tests, deployment, page-level conversion path | Market-wide demand collection or cross-project memory |
-| **MotionPress** | Approved source-to-video planning, storyboard, rendering, editing, QA, channel assets | Topic discovery without an approved brief, factual invention, replacing the canonical source artifact |
-| **Publisher Yield Router** | Page-level monetization policy, display/affiliate/lead/product/sponsor routing, experiments, revenue and cost ledger | Choosing what deserves to exist, overriding trust or conversion-critical boundaries |
-| **Push Indexer** | Submitting changed canonical URLs after deployment | Topic discovery, content creation, ranking guarantees |
-| **PageSpace** | Human queue, approvals, owners, calendar, decision mirror when available | Canonical evidence or transactional state |
-| **Reverie** | Approved durable lessons, failures, policy changes, reusable decisions | Raw prospect PII, raw community archives, task tracking, canonical metrics |
+| System                     | Owns                                                                                                                                                             | Must not own                                                                                          |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **OpenSEO Demand Pulse**   | Source acquisition, source health, observations, provenance, dedupe, independent evidence, problem-family feed, initial coverage and score lineage               | Publishing, creative production, ad placement, final business claims                                  |
+| **Constellation**          | Prompt Demand Graph, prompt-to-page fit, citation/retrieval evidence, competitor and coverage analysis, action prioritization, stability, outcome interpretation | Raw unrestricted social archives, autonomous publishing, anonymous recommendations without lineage    |
+| **Project repository**     | Canonical facts, approved content, tools, schemas, tests, deployment, page-level conversion path                                                                 | Market-wide demand collection or cross-project memory                                                 |
+| **MotionPress**            | Approved source-to-video planning, storyboard, rendering, editing, QA, channel assets                                                                            | Topic discovery without an approved brief, factual invention, replacing the canonical source artifact |
+| **Publisher Yield Router** | Page-level monetization policy, display/affiliate/lead/product/sponsor routing, experiments, revenue and cost ledger                                             | Choosing what deserves to exist, overriding trust or conversion-critical boundaries                   |
+| **Push Indexer**           | Submitting changed canonical URLs after deployment                                                                                                               | Topic discovery, content creation, ranking guarantees                                                 |
+| **PageSpace**              | Human queue, approvals, owners, calendar, decision mirror when available                                                                                         | Canonical evidence or transactional state                                                             |
+| **Reverie**                | Approved durable lessons, failures, policy changes, reusable decisions                                                                                           | Raw prospect PII, raw community archives, task tracking, canonical metrics                            |
 
 ## One lineage, many artifacts
 
@@ -129,14 +129,14 @@ Traffic is diagnostic. The decision metric is contribution and durable authority
 
 Every page or asset receives one route or an explicit combination:
 
-| Route | Best fit | Primary risk |
-| --- | --- | --- |
-| Lead generation | High-intent service and consultation pages | Ads or exits reducing conversion |
-| Affiliate | Product selection, compatibility, and comparison | Trust erosion and merchant dependence |
-| Paid product/report | Reusable decision tools and operational templates | Support burden and weak willingness to pay |
-| Sponsorship | Trusted recurring data or niche media assets | Hidden influence over rankings or claims |
-| Display | Broad informational and repeat-use utility pages | UX, policy, RPM, and traffic-quality risk |
-| No monetization | Trust, policy, conversion-critical, or YMYL pages | Forcing monetization where it reduces trust or conversion |
+| Route               | Best fit                                          | Primary risk                                              |
+| ------------------- | ------------------------------------------------- | --------------------------------------------------------- |
+| Lead generation     | High-intent service and consultation pages        | Ads or exits reducing conversion                          |
+| Affiliate           | Product selection, compatibility, and comparison  | Trust erosion and merchant dependence                     |
+| Paid product/report | Reusable decision tools and operational templates | Support burden and weak willingness to pay                |
+| Sponsorship         | Trusted recurring data or niche media assets      | Hidden influence over rankings or claims                  |
+| Display             | Broad informational and repeat-use utility pages  | UX, policy, RPM, and traffic-quality risk                 |
+| No monetization     | Trust, policy, conversion-critical, or YMYL pages | Forcing monetization where it reduces trust or conversion |
 
 A route can change after outcomes arrive. Historical decisions remain versioned.
 

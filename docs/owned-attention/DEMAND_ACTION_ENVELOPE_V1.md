@@ -125,17 +125,13 @@ These values cannot be relaxed by a downstream consumer.
     "observedLanguage": [
       "bounded exact wording retained under the source policy"
     ],
-    "provenanceRefs": [
-      "evidence-event-uuid"
-    ],
+    "provenanceRefs": ["evidence-event-uuid"],
     "sourceHealth": "healthy",
     "limitations": []
   },
   "coverage": {
     "status": "partial",
-    "candidateUrls": [
-      "https://www.onfarmcompost.com/commercial-composting"
-    ],
+    "candidateUrls": ["https://www.onfarmcompost.com/commercial-composting"],
     "reason": "The current page explains the service but does not answer pricing inputs or route-fit constraints.",
     "recommendedAction": "update_existing_page"
   },
@@ -148,9 +144,7 @@ These values cannot be relaxed by a downstream consumer.
   },
   "economics": {
     "businessValue": "medium",
-    "monetizationCandidates": [
-      "lead_generation"
-    ],
+    "monetizationCandidates": ["lead_generation"],
     "estimatedProductionHours": null,
     "maintenanceRisk": "medium",
     "confidence": "low"
