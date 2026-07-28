@@ -1,0 +1,63 @@
+name: Temporary Link Ops formatter
+
+on:
+  push:
+    branches:
+      - docs/internal-backlink-ops-v1
+    paths:
+      - .github/workflows/link-ops-format-helper.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: docs/internal-backlink-ops-v1
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format Link Ops contracts
+        run: >-
+          pnpm exec prettier --write
+          docs/owned-attention/BACKLINK_OPS_AGENT_HANDOFF.md
+          docs/owned-attention/BACKLINK_OPS_V1.md
+          docs/owned-attention/README.md
+          docs/owned-attention/link-opportunity-envelope.example.json
+          docs/owned-attention/link-opportunity-envelope.v1.schema.json
+
+      - name: Commit formatting
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "No formatting changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            docs/owned-attention/BACKLINK_OPS_AGENT_HANDOFF.md \
+            docs/owned-attention/BACKLINK_OPS_V1.md \
+            docs/owned-attention/README.md \
+            docs/owned-attention/link-opportunity-envelope.example.json \
+            docs/owned-attention/link-opportunity-envelope.v1.schema.json
+          git commit -m "style(link-ops): apply prettier"
+          git push origin HEAD:docs/internal-backlink-ops-v1
