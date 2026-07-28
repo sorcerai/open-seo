@@ -1,76 +1,53 @@
-# OpenSEO
+# OpenSEO — legacy internal fork
 
-> Open source alternative to Semrush and Ahrefs
+> **Status:** retained for provenance during an internal repository cutover. This fork is not the canonical home for new internal development.
 
-OpenSEO is an SEO tool for _the people_. If tools like Semrush or Ahrefs are too expensive or bloated, OpenSEO is a pay-as-you-go alternative that you actually control.
+The upstream OpenSEO project remains a useful open-source SEO application. This SorcerAI fork was also used as the historical foundation for an internal search-demand and decision system.
 
-> All-in-one SEO tool for you and your AI agent.
+New internal feature work has moved to a private canonical repository. Do not open or revive internal Demand Pulse, Decision Surface, Link Ops, action-export, provider, source-policy, or portfolio work in this fork.
 
-Connect with any agent like Claude Code, OpenClaw or Hermes. We have pre-built skills, but you can build your own to tailor OpenSEO to your needs.
+Historical commits, issues, pull requests, schemas, migrations, environment variables, routes, and resource names may remain here for auditability. Their presence does not make this repository an active internal product or canonical producer.
 
-<img width="1385" height="794" alt="Image" src="https://github.com/user-attachments/assets/fd208249-44ea-4849-bb4b-5fc896aeab73" />
+## Repository rules during cutover
 
-## Hosted Version
+- Preserve history and upstream attribution.
+- Do not implement new internal features here.
+- Close duplicate internal PRs with a pointer to the canonical replacement.
+- Do not emit this repository's historical producer identity from a new runtime.
+- Do not rewrite historical events or schemas merely to improve naming.
+- Do not archive or delete the repository until live infrastructure, secrets, deployments, stored data, integrations, and compatibility aliases have been inventoried.
+- Public OpenSEO packaging, upstream contribution, and internal product decisions remain separate concerns.
 
-Try OpenSEO for free on our website. If you want to support the project, a hosted subscription is $10/month.
+## Archive gate
 
-[openseo.so](https://openseo.so)
+Archive this fork only after the internal owner verifies:
 
-## Why use OpenSEO?
+- [ ] the canonical private repository has its own README, project state, CI, and deployment boundary;
+- [ ] current Demand Pulse, Decision Surface, Link Ops, and action-handoff contracts live only in the canonical repository;
+- [ ] the downstream decision system accepts the canonical producer identity;
+- [ ] active internal project repositories point to the canonical system;
+- [ ] no internal feature PR remains open only in this fork;
+- [ ] deployed resources that still use OpenSEO names are listed as compatibility aliases;
+- [ ] required historical fixtures and migration notes are preserved;
+- [ ] rollback and retention obligations are documented.
 
-- Best in class MCP and AI Skills.
-- Modern, simple UI.
-  - Focused workflows instead of a bloated, complex SEO suite.
-- No subscriptions.
-  - Bring your own DataForSEO API key and pay only for what you use.
-- Fork and vibe code your own custom tool.
+Until those checks pass, this repository is **legacy provenance**, not archived completion.
 
-## Main SEO Workflows
+---
 
-- Keyword research
-- Rank tracking
-- Competitor Insights
-- Backlinks
-- Site Audits
-- AI Visibility
+## Historical upstream project description
 
-## OpenSEO MCP & Agent Skills
+OpenSEO is an open-source alternative to Semrush and Ahrefs. The upstream product provides keyword research, rank tracking, competitor insights, backlinks, site audits, AI visibility, MCP access, agent skills, hosted service, and self-hosting paths.
 
-OpenSEO exposes an MCP server so AI agents like Claude Code, OpenClaw, and Hermes can use your SEO data directly. Agent Skills are reusable workflows that guide your agent through SEO tasks using the MCP.
+Upstream project and documentation:
 
-- [Set up OpenSEO MCP](https://openseo.so/docs/mcp)
-- [Set up OpenSEO Agent Skills](https://openseo.so/docs/skills/setup)
+- Website: `https://openseo.so`
+- MCP setup: `https://openseo.so/docs/mcp`
+- Agent Skills: `https://openseo.so/docs/skills/setup`
+- Docker self-hosting: [`docs/SELF_HOSTING_DOCKER.md`](./docs/SELF_HOSTING_DOCKER.md)
+- Cloudflare self-hosting: [`docs/SELF_HOSTING_CLOUDFLARE.md`](./docs/SELF_HOSTING_CLOUDFLARE.md)
+- DataForSEO setup: [`docs/DATAFORSEO_API_KEY.md`](./docs/DATAFORSEO_API_KEY.md)
+- Local development: [`docs/LOCAL_DEVELOPMENT.md`](./docs/LOCAL_DEVELOPMENT.md)
+- Contributing: [`docs/CONTRIBUTING.md`](./docs/CONTRIBUTING.md)
 
-## Self-Hosting
-
-OpenSEO supports two self-hosting paths:
-
-- **Simple: Docker** for personal use on your own machine (recommended for getting started). See [`docs/SELF_HOSTING_DOCKER.md`](./docs/SELF_HOSTING_DOCKER.md).
-- **Advanced: Cloudflare** for internet-facing self-hosting across multiple devices or with your team (works on the free plan). See [`docs/SELF_HOSTING_CLOUDFLARE.md`](./docs/SELF_HOSTING_CLOUDFLARE.md).
-
-Either way, you need a DataForSEO API key to get SEO data. See [`docs/DATAFORSEO_API_KEY.md`](./docs/DATAFORSEO_API_KEY.md).
-
-## Costs
-
-OpenSEO needs a [DataForSEO](https://dataforseo.com/?aff=255379) API key so that you can get SEO data. You pay them directly when self hosting.
-
-See [openseo.so/pricing](https://openseo.so/pricing)
-
-When you self host, your costs will be slightly lower than the estimates on our website. The way the hosted service makes money is by charging 28% extra for every request we make to DataForSEO.
-
-## Local Development
-
-See [`docs/LOCAL_DEVELOPMENT.md`](./docs/LOCAL_DEVELOPMENT.md).
-
-## Contributing
-
-Contributions are very welcome. See [`docs/CONTRIBUTING.md`](./docs/CONTRIBUTING.md).
-
-## Community
-
-Join Discord to chat: [Discord](https://discord.gg/c9uGs3cFXr)
-
-Follow along for updates:
-
-- Follow on X: https://x.com/bensenescu
-- Sign up for the mailing list on our website: [openseo.so](https://openseo.so)
+The original upstream README and history remain available in Git. This notice changes the status of the SorcerAI fork; it does not claim ownership of the upstream OpenSEO project or erase its provenance.
