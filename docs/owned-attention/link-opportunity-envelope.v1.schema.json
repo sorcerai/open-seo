@@ -1,0 +1,673 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-seo.local/schemas/link-opportunity-envelope.v1.schema.json",
+  "title": "Link Opportunity Envelope v1",
+  "description": "Project-scoped, PII-minimized contract for reviewing and measuring a link acquisition opportunity across OpenSEO, Constellation, PageSpace mirrors, project repositories, Push Indexer lineage, and Reverie learning exports.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "envelopeId",
+    "projectId",
+    "projectDomain",
+    "opportunityId",
+    "createdAt",
+    "updatedAt",
+    "targetAsset",
+    "prospect",
+    "evidence",
+    "qualification",
+    "decision",
+    "execution",
+    "lineage"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "envelopeId": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "projectId": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "projectDomain": {
+      "$ref": "#/$defs/domain"
+    },
+    "opportunityId": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "createdAt": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "updatedAt": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "targetAsset": {
+      "$ref": "#/$defs/targetAsset"
+    },
+    "prospect": {
+      "$ref": "#/$defs/prospect"
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/evidenceReference"
+      }
+    },
+    "qualification": {
+      "$ref": "#/$defs/qualification"
+    },
+    "decision": {
+      "$ref": "#/$defs/decision"
+    },
+    "execution": {
+      "$ref": "#/$defs/execution"
+    },
+    "placement": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/placement"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "lineage": {
+      "$ref": "#/$defs/lineage"
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullableString": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "nullableTimestamp": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/timestamp"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https?://"
+    },
+    "nullableUrl": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/url"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "domain": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 253,
+      "pattern": "^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,63}$"
+    },
+    "targetAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assetId",
+        "url",
+        "title",
+        "assetType",
+        "referenceReason",
+        "approvalState"
+      ],
+      "properties": {
+        "assetId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "url": {
+          "$ref": "#/$defs/url"
+        },
+        "title": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "assetType": {
+          "enum": [
+            "guide",
+            "tool",
+            "template",
+            "dataset",
+            "study",
+            "statistics",
+            "comparison",
+            "directory",
+            "product",
+            "service_page",
+            "support_resource",
+            "news_or_update",
+            "other"
+          ]
+        },
+        "audience": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "topic": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "referenceReason": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "version": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "contentHash": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "approvalState": {
+          "enum": [
+            "draft",
+            "approved",
+            "published",
+            "retired"
+          ]
+        }
+      }
+    },
+    "prospect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "sourceUrl",
+        "opportunityType",
+        "discoveryMethod",
+        "relationship"
+      ],
+      "properties": {
+        "domain": {
+          "$ref": "#/$defs/domain"
+        },
+        "sourceUrl": {
+          "$ref": "#/$defs/url"
+        },
+        "pageTitle": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "opportunityType": {
+          "enum": [
+            "profile_or_directory",
+            "resource_page",
+            "editorial_article",
+            "comparison_or_alternatives",
+            "statistics_or_data_citation",
+            "broken_link_replacement",
+            "lost_link_recovery",
+            "partner_or_integration_directory",
+            "association_or_membership",
+            "local_or_government_resource",
+            "university_or_extension_resource",
+            "podcast_or_newsletter",
+            "press_or_news",
+            "sponsorship",
+            "other"
+          ]
+        },
+        "discoveryMethod": {
+          "enum": [
+            "clean_room_catalog",
+            "competitor_gap",
+            "serp_prospecting",
+            "lost_link",
+            "demand_pulse",
+            "constellation",
+            "manual",
+            "other"
+          ]
+        },
+        "relationship": {
+          "enum": [
+            "editorial",
+            "submission",
+            "membership",
+            "partnership",
+            "contribution",
+            "sponsorship",
+            "unknown"
+          ]
+        },
+        "catalogEntryId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "contactRef": {
+          "description": "Reference to a canonical OpenSEO contact record. Raw contact values must not be embedded in this envelope.",
+          "$ref": "#/$defs/nullableString"
+        },
+        "submissionUrl": {
+          "$ref": "#/$defs/nullableUrl"
+        },
+        "editorialGuidelinesUrl": {
+          "$ref": "#/$defs/nullableUrl"
+        }
+      }
+    },
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceId",
+        "evidenceType",
+        "state",
+        "confidence",
+        "sourceType",
+        "capturedAt"
+      ],
+      "properties": {
+        "evidenceId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "evidenceType": {
+          "enum": [
+            "backlink",
+            "referring_domain",
+            "serp_result",
+            "page_content",
+            "submission_path",
+            "contact_path",
+            "editorial_guideline",
+            "policy",
+            "metric",
+            "conflict_check",
+            "verification",
+            "operator_note",
+            "other"
+          ]
+        },
+        "state": {
+          "enum": [
+            "observed",
+            "inferred",
+            "unknown"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "sourceType": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sourceUrl": {
+          "$ref": "#/$defs/nullableUrl"
+        },
+        "provider": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "capturedAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "artifactRef": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "contentHash": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "scoreComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "label",
+        "value",
+        "maxValue",
+        "evidenceIds"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "label": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "value": {
+          "type": "number"
+        },
+        "maxValue": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "explanation": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "penalty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "value",
+        "reason",
+        "evidenceIds"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "value": {
+          "type": "number",
+          "maximum": 0
+        },
+        "reason": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eligibility",
+        "priorityBand",
+        "score",
+        "configVersion",
+        "components",
+        "penalties",
+        "risks",
+        "unknowns",
+        "evaluatedAt"
+      ],
+      "properties": {
+        "eligibility": {
+          "enum": [
+            "eligible",
+            "ineligible",
+            "research_required",
+            "conflict_blocked"
+          ]
+        },
+        "priorityBand": {
+          "enum": [
+            "P0",
+            "P1",
+            "RESEARCH",
+            "ARCHIVE"
+          ]
+        },
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "configVersion": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/scoreComponent"
+          }
+        },
+        "penalties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/penalty"
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "evaluatedAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "reason",
+        "evidenceIds"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "deferred",
+            "research_requested",
+            "conflict_blocked"
+          ]
+        },
+        "decidedBy": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "decidedAt": {
+          "$ref": "#/$defs/nullableTimestamp"
+        },
+        "reason": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "status",
+        "nextAction",
+        "externalReferenceIds"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "manual_profile_or_directory_submission",
+            "editorial_update_request",
+            "resource_inclusion_request",
+            "broken_link_replacement",
+            "expert_quote_or_data_contribution",
+            "partnership_or_integration",
+            "press_or_news_pitch",
+            "sponsorship_with_qualified_link",
+            "lost_link_recovery",
+            "not_selected"
+          ]
+        },
+        "status": {
+          "enum": [
+            "not_started",
+            "instructions_ready",
+            "draft_ready",
+            "human_approved",
+            "submitted_or_sent",
+            "replied",
+            "accepted",
+            "rejected",
+            "no_response",
+            "cancelled"
+          ]
+        },
+        "nextAction": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "dueAt": {
+          "$ref": "#/$defs/nullableTimestamp"
+        },
+        "approvalEventId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "externalReferenceIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceUrl",
+        "targetUrl",
+        "rel",
+        "verdict",
+        "discoveryState",
+        "firstSeenAt",
+        "lastVerifiedAt"
+      ],
+      "properties": {
+        "sourceUrl": {
+          "$ref": "#/$defs/url"
+        },
+        "targetUrl": {
+          "$ref": "#/$defs/url"
+        },
+        "anchor": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "rel": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "verdict": {
+          "enum": [
+            "live",
+            "live_qualified",
+            "target_mismatch",
+            "missing",
+            "source_unreachable",
+            "blocked",
+            "lost",
+            "unknown"
+          ]
+        },
+        "discoveryState": {
+          "enum": [
+            "not_checked",
+            "reachable",
+            "crawlable",
+            "provider_observed",
+            "search_observed",
+            "search_console_indexed",
+            "not_observed",
+            "unknown"
+          ]
+        },
+        "firstSeenAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "lastVerifiedAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "lostAt": {
+          "$ref": "#/$defs/nullableTimestamp"
+        },
+        "verificationRunId": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "discoveryRunId",
+        "scoreId",
+        "executionAttemptIds",
+        "verificationRunIds",
+        "outcomeSnapshotIds"
+      ],
+      "properties": {
+        "demandActionEnvelopeId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "constellationReviewId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "discoveryRunId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "scoreId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "executionAttemptIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "verificationRunIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "outcomeSnapshotIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "ownedDeploymentId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "pushIndexerJobId": {
+          "description": "Only valid for a changed owned target asset. Never identifies submission of the third-party source URL.",
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    }
+  }
+}
