@@ -68,9 +68,7 @@
         "value": 22,
         "maxValue": 25,
         "explanation": "The source page and owned asset address the same practical composting audience.",
-        "evidenceIds": [
-          "evidence_source_page_001"
-        ]
+        "evidenceIds": ["evidence_source_page_001"]
       },
       {
         "key": "asset_reference_value",
@@ -78,9 +76,7 @@
         "value": 16,
         "maxValue": 20,
         "explanation": "The owned page offers a useful operational reference rather than a generic sales page.",
-        "evidenceIds": [
-          "evidence_source_page_001"
-        ]
+        "evidenceIds": ["evidence_source_page_001"]
       },
       {
         "key": "source_quality",
@@ -88,9 +84,7 @@
         "value": 11,
         "maxValue": 15,
         "explanation": "The example source is treated as maintained for fixture purposes; production evidence must establish this independently.",
-        "evidenceIds": [
-          "evidence_source_page_001"
-        ]
+        "evidenceIds": ["evidence_source_page_001"]
       },
       {
         "key": "acquisition_probability",
@@ -98,9 +92,7 @@
         "value": 10,
         "maxValue": 15,
         "explanation": "A public editorial-guidelines path exists, but no contact has been approved or used.",
-        "evidenceIds": [
-          "evidence_guidelines_001"
-        ]
+        "evidenceIds": ["evidence_guidelines_001"]
       },
       {
         "key": "qualified_referral_potential",
@@ -108,9 +100,7 @@
         "value": 6,
         "maxValue": 10,
         "explanation": "Audience fit exists, while actual referral volume remains unknown.",
-        "evidenceIds": [
-          "evidence_source_page_001"
-        ]
+        "evidenceIds": ["evidence_source_page_001"]
       },
       {
         "key": "competitive_gap_uniqueness",
@@ -126,9 +116,7 @@
         "value": 3,
         "maxValue": 5,
         "explanation": "The page was observed during the current run; maintenance history remains unknown.",
-        "evidenceIds": [
-          "evidence_source_page_001"
-        ]
+        "evidenceIds": ["evidence_source_page_001"]
       }
     ],
     "penalties": [],
@@ -147,10 +135,7 @@
     "decidedBy": null,
     "decidedAt": null,
     "reason": "Pending human review; the fixture does not authorize execution.",
-    "evidenceIds": [
-      "evidence_source_page_001",
-      "evidence_guidelines_001"
-    ]
+    "evidenceIds": ["evidence_source_page_001", "evidence_guidelines_001"]
   },
   "execution": {
     "method": "resource_inclusion_request",

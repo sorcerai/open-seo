@@ -86,10 +86,7 @@
       "minLength": 1
     },
     "nullableString": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": ["string", "null"]
     },
     "timestamp": {
       "type": "string",
@@ -180,12 +177,7 @@
           "$ref": "#/$defs/nullableString"
         },
         "approvalState": {
-          "enum": [
-            "draft",
-            "approved",
-            "published",
-            "retired"
-          ]
+          "enum": ["draft", "approved", "published", "retired"]
         }
       }
     },
@@ -299,11 +291,7 @@
           ]
         },
         "state": {
-          "enum": [
-            "observed",
-            "inferred",
-            "unknown"
-          ]
+          "enum": ["observed", "inferred", "unknown"]
         },
         "confidence": {
           "type": "number",
@@ -333,13 +321,7 @@
     "scoreComponent": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "key",
-        "label",
-        "value",
-        "maxValue",
-        "evidenceIds"
-      ],
+      "required": ["key", "label", "value", "maxValue", "evidenceIds"],
       "properties": {
         "key": {
           "$ref": "#/$defs/nonEmptyString"
@@ -368,12 +350,7 @@
     "penalty": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "key",
-        "value",
-        "reason",
-        "evidenceIds"
-      ],
+      "required": ["key", "value", "reason", "evidenceIds"],
       "properties": {
         "key": {
           "$ref": "#/$defs/nonEmptyString"
@@ -417,12 +394,7 @@
           ]
         },
         "priorityBand": {
-          "enum": [
-            "P0",
-            "P1",
-            "RESEARCH",
-            "ARCHIVE"
-          ]
+          "enum": ["P0", "P1", "RESEARCH", "ARCHIVE"]
         },
         "score": {
           "type": "integer",
@@ -464,11 +436,7 @@
     "decision": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "state",
-        "reason",
-        "evidenceIds"
-      ],
+      "required": ["state", "reason", "evidenceIds"],
       "properties": {
         "state": {
           "enum": [
@@ -500,12 +468,7 @@
     "execution": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "method",
-        "status",
-        "nextAction",
-        "externalReferenceIds"
-      ],
+      "required": ["method", "status", "nextAction", "externalReferenceIds"],
       "properties": {
         "method": {
           "enum": [

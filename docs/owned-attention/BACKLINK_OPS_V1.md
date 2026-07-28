@@ -71,16 +71,16 @@ The daily operator surface should answer five questions:
 
 ## 4. Repository ownership
 
-| System | Owns | Must not own |
-| --- | --- | --- |
-| **OpenSEO Link Ops** | Opportunity discovery, catalog, qualification, queue, status, public contact-path evidence, execution records, verification, backlink outcome snapshots | Publishing on third-party sites, invented contacts, automatic mass outreach, ranking guarantees |
-| **OpenSEO Backlinks** | Current and historical backlink/referring-domain evidence from DataForSEO | Campaign state or human decisions |
-| **OpenSEO Demand Pulse** | Observed demand and source evidence that may justify a linkable asset or citation request | Link execution |
-| **Constellation** | Coverage, citation fit, competing-page evidence, and action review for `request_partnership_or_citation` | Raw prospect PII, email sending, canonical task state |
-| **Project repository** | The owned page/tool/data asset, factual claims, deployment, analytics instrumentation | Cross-project prospect memory |
-| **Push Indexer** | Submission of changed **owned canonical URLs** after deployment | Submitting third-party backlink pages, forcing indexing, or claiming rankings |
-| **PageSpace** | Human-readable queue/decision mirror when available | Canonical state, evidence blobs, raw contact PII |
-| **Reverie** | Approved durable lessons, failed patterns, policy changes, reusable decisions | Raw email addresses, raw prospect archives, task state, canonical metrics |
+| System                   | Owns                                                                                                                                                    | Must not own                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **OpenSEO Link Ops**     | Opportunity discovery, catalog, qualification, queue, status, public contact-path evidence, execution records, verification, backlink outcome snapshots | Publishing on third-party sites, invented contacts, automatic mass outreach, ranking guarantees |
+| **OpenSEO Backlinks**    | Current and historical backlink/referring-domain evidence from DataForSEO                                                                               | Campaign state or human decisions                                                               |
+| **OpenSEO Demand Pulse** | Observed demand and source evidence that may justify a linkable asset or citation request                                                               | Link execution                                                                                  |
+| **Constellation**        | Coverage, citation fit, competing-page evidence, and action review for `request_partnership_or_citation`                                                | Raw prospect PII, email sending, canonical task state                                           |
+| **Project repository**   | The owned page/tool/data asset, factual claims, deployment, analytics instrumentation                                                                   | Cross-project prospect memory                                                                   |
+| **Push Indexer**         | Submission of changed **owned canonical URLs** after deployment                                                                                         | Submitting third-party backlink pages, forcing indexing, or claiming rankings                   |
+| **PageSpace**            | Human-readable queue/decision mirror when available                                                                                                     | Canonical state, evidence blobs, raw contact PII                                                |
+| **Reverie**              | Approved durable lessons, failed patterns, policy changes, reusable decisions                                                                           | Raw email addresses, raw prospect archives, task state, canonical metrics                       |
 
 ## 5. Scope
 
@@ -224,15 +224,15 @@ Paid advertising or sponsorship may remain eligible for referral/brand value onl
 
 Store every component, evidence ID, missing value, config version, and calculation timestamp. Re-scoring creates a new score record.
 
-| Dimension | Weight | Question |
-| --- | ---: | --- |
-| Topical/editorial fit | 25 | Would this page's audience reasonably benefit from the asset? |
-| Asset/reference value | 20 | Is there a concrete fact, tool, data point, guide, or utility worth citing? |
-| Source quality | 15 | Is the source real, maintained, discoverable, and non-spammy? |
-| Acquisition probability | 15 | Is there a legitimate submission, editorial, contributor, or contact path? |
-| Qualified referral potential | 10 | Could the placement send relevant humans, not merely metric vapor? |
-| Competitive gap/uniqueness | 10 | Does it close a real gap or recover a lost relationship? |
-| Freshness | 5 | Is the page/program currently active and recently verified? |
+| Dimension                    | Weight | Question                                                                    |
+| ---------------------------- | -----: | --------------------------------------------------------------------------- |
+| Topical/editorial fit        |     25 | Would this page's audience reasonably benefit from the asset?               |
+| Asset/reference value        |     20 | Is there a concrete fact, tool, data point, guide, or utility worth citing? |
+| Source quality               |     15 | Is the source real, maintained, discoverable, and non-spammy?               |
+| Acquisition probability      |     15 | Is there a legitimate submission, editorial, contributor, or contact path?  |
+| Qualified referral potential |     10 | Could the placement send relevant humans, not merely metric vapor?          |
+| Competitive gap/uniqueness   |     10 | Does it close a real gap or recover a lost relationship?                    |
+| Freshness                    |      5 | Is the page/program currently active and recently verified?                 |
 
 Visible penalties:
 
