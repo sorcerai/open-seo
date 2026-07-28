@@ -61,6 +61,7 @@ The system arbitrages:
 | System                     | Owns                                                                                                                                                             | Must not own                                                                                          |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | **OpenSEO Demand Pulse**   | Source acquisition, source health, observations, provenance, dedupe, independent evidence, problem-family feed, initial coverage and score lineage               | Publishing, creative production, ad placement, final business claims                                  |
+| **OpenSEO Link Ops**       | Project-scoped link assets, opportunity evidence, qualification, human decisions, execution records, placement verification, and link outcomes                  | Public SaaS scope, autonomous outreach, backlink exchanges, ranking guarantees, third-party indexing submissions |
 | **Constellation**          | Prompt Demand Graph, prompt-to-page fit, citation/retrieval evidence, competitor and coverage analysis, action prioritization, stability, outcome interpretation | Raw unrestricted social archives, autonomous publishing, anonymous recommendations without lineage    |
 | **Project repository**     | Canonical facts, approved content, tools, schemas, tests, deployment, page-level conversion path                                                                 | Market-wide demand collection or cross-project memory                                                 |
 | **MotionPress**            | Approved source-to-video planning, storyboard, rendering, editing, QA, channel assets                                                                            | Topic discovery without an approved brief, factual invention, replacing the canonical source artifact |
@@ -174,3 +175,7 @@ The first success condition is one complete, trustworthy loop that another proje
 - [`demand-action-envelope.v1.schema.json`](demand-action-envelope.v1.schema.json)
 - [`outcome-envelope.v1.schema.json`](outcome-envelope.v1.schema.json)
 - [`AGENT_HANDOFF.md`](AGENT_HANDOFF.md)
+- [`BACKLINK_OPS_V1.md`](BACKLINK_OPS_V1.md)
+- [`link-opportunity-envelope.v1.schema.json`](link-opportunity-envelope.v1.schema.json)
+- [`link-opportunity-envelope.example.json`](link-opportunity-envelope.example.json)
+- [`BACKLINK_OPS_AGENT_HANDOFF.md`](BACKLINK_OPS_AGENT_HANDOFF.md)
