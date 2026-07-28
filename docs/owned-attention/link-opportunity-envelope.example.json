@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "1.0",
+  "envelopeId": "loe_01JZBACKLINKEXAMPLE000001",
+  "projectId": "project_onfarmcompost",
+  "projectDomain": "onfarmcompost.com",
+  "opportunityId": "linkopp_example_resource_page",
+  "createdAt": "2026-07-27T22:00:00Z",
+  "updatedAt": "2026-07-27T22:00:00Z",
+  "targetAsset": {
+    "assetId": "asset_compost_resource",
+    "url": "https://onfarmcompost.com/",
+    "title": "OnFarmCompost",
+    "assetType": "guide",
+    "audience": "Farmers and small agricultural operators",
+    "topic": "On-farm composting",
+    "referenceReason": "Existing practical composting resource relevant to a curated agricultural resource page.",
+    "version": "2026-07-27",
+    "contentHash": null,
+    "approvalState": "published"
+  },
+  "prospect": {
+    "domain": "example.org",
+    "sourceUrl": "https://example.org/resources/composting",
+    "pageTitle": "Composting resources",
+    "opportunityType": "resource_page",
+    "discoveryMethod": "serp_prospecting",
+    "relationship": "editorial",
+    "catalogEntryId": null,
+    "contactRef": null,
+    "submissionUrl": null,
+    "editorialGuidelinesUrl": "https://example.org/editorial-guidelines"
+  },
+  "evidence": [
+    {
+      "evidenceId": "evidence_source_page_001",
+      "evidenceType": "page_content",
+      "state": "observed",
+      "confidence": 0.95,
+      "sourceType": "public_web_page",
+      "sourceUrl": "https://example.org/resources/composting",
+      "provider": null,
+      "capturedAt": "2026-07-27T21:55:00Z",
+      "artifactRef": "r2://link-ops/example/source-page-001.html",
+      "contentHash": "sha256:example-source-page-hash"
+    },
+    {
+      "evidenceId": "evidence_guidelines_001",
+      "evidenceType": "editorial_guideline",
+      "state": "observed",
+      "confidence": 0.9,
+      "sourceType": "public_web_page",
+      "sourceUrl": "https://example.org/editorial-guidelines",
+      "provider": null,
+      "capturedAt": "2026-07-27T21:56:00Z",
+      "artifactRef": "r2://link-ops/example/guidelines-001.html",
+      "contentHash": "sha256:example-guidelines-hash"
+    }
+  ],
+  "qualification": {
+    "eligibility": "eligible",
+    "priorityBand": "P1",
+    "score": 74,
+    "configVersion": "link-ops-score.v1",
+    "components": [
+      {
+        "key": "topical_editorial_fit",
+        "label": "Topical and editorial fit",
+        "value": 22,
+        "maxValue": 25,
+        "explanation": "The source page and owned asset address the same practical composting audience.",
+        "evidenceIds": [
+          "evidence_source_page_001"
+        ]
+      },
+      {
+        "key": "asset_reference_value",
+        "label": "Asset reference value",
+        "value": 16,
+        "maxValue": 20,
+        "explanation": "The owned page offers a useful operational reference rather than a generic sales page.",
+        "evidenceIds": [
+          "evidence_source_page_001"
+        ]
+      },
+      {
+        "key": "source_quality",
+        "label": "Source quality",
+        "value": 11,
+        "maxValue": 15,
+        "explanation": "The example source is treated as maintained for fixture purposes; production evidence must establish this independently.",
+        "evidenceIds": [
+          "evidence_source_page_001"
+        ]
+      },
+      {
+        "key": "acquisition_probability",
+        "label": "Acquisition probability",
+        "value": 10,
+        "maxValue": 15,
+        "explanation": "A public editorial-guidelines path exists, but no contact has been approved or used.",
+        "evidenceIds": [
+          "evidence_guidelines_001"
+        ]
+      },
+      {
+        "key": "qualified_referral_potential",
+        "label": "Qualified referral potential",
+        "value": 6,
+        "maxValue": 10,
+        "explanation": "Audience fit exists, while actual referral volume remains unknown.",
+        "evidenceIds": [
+          "evidence_source_page_001"
+        ]
+      },
+      {
+        "key": "competitive_gap_uniqueness",
+        "label": "Competitive gap and uniqueness",
+        "value": 6,
+        "maxValue": 10,
+        "explanation": "The candidate is relevant, but no competitor-gap evidence is attached to this fixture.",
+        "evidenceIds": []
+      },
+      {
+        "key": "freshness",
+        "label": "Freshness",
+        "value": 3,
+        "maxValue": 5,
+        "explanation": "The page was observed during the current run; maintenance history remains unknown.",
+        "evidenceIds": [
+          "evidence_source_page_001"
+        ]
+      }
+    ],
+    "penalties": [],
+    "risks": [
+      "Production qualification must replace example.org fixture evidence with a real independently researched source."
+    ],
+    "unknowns": [
+      "Actual referral traffic",
+      "Publisher response probability",
+      "Whether the editor would accept this specific asset"
+    ],
+    "evaluatedAt": "2026-07-27T22:00:00Z"
+  },
+  "decision": {
+    "state": "pending",
+    "decidedBy": null,
+    "decidedAt": null,
+    "reason": "Pending human review; the fixture does not authorize execution.",
+    "evidenceIds": [
+      "evidence_source_page_001",
+      "evidence_guidelines_001"
+    ]
+  },
+  "execution": {
+    "method": "resource_inclusion_request",
+    "status": "not_started",
+    "nextAction": "Review the source page and confirm that the owned asset is a truthful editorial fit.",
+    "dueAt": null,
+    "approvalEventId": null,
+    "externalReferenceIds": []
+  },
+  "placement": null,
+  "lineage": {
+    "demandActionEnvelopeId": null,
+    "constellationReviewId": null,
+    "discoveryRunId": "linkrun_example_001",
+    "scoreId": "linkscore_example_001",
+    "executionAttemptIds": [],
+    "verificationRunIds": [],
+    "outcomeSnapshotIds": [],
+    "ownedDeploymentId": null,
+    "pushIndexerJobId": null
+  }
+}
