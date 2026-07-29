@@ -1,5 +1,8 @@
 # OpenSEO
 
+> [!IMPORTANT]
+> This fork is archived and retained as the pre-cutover public history. Active SorcerAI development continues privately in Search Ops.
+
 > Open source alternative to Semrush and Ahrefs
 
 OpenSEO is an SEO tool for _the people_. If tools like Semrush or Ahrefs are too expensive or bloated, OpenSEO is a pay-as-you-go alternative that you actually control.
